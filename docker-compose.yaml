@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: online-cinema-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:password@db:5432/onlinecinemadb
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - online-cinema-net
+
+  frontend:
+    build: ./frontend
+    container_name: online-cinema-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - online-cinema-net
+
+  db:
+    image: postgres:15
+    container_name: online-cinema-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: onlinecinemadb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - online-cinema-net
+
+volumes:
+  postgres_data:
+
+
+networks:
+  online-cinema-net:
+    driver: bridge
