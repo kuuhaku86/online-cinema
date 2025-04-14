@@ -1,5 +1,5 @@
 # frontend/Dockerfile
-FROM node:20-alpine AS build
+FROM node:slim AS build
 
 WORKDIR /app
 
