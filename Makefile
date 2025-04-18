@@ -24,3 +24,7 @@ build:
 rebuild:
 	docker-compose -p $(PROJECT_NAME) down
 	docker-compose -p $(PROJECT_NAME) up --build -d
+
+test-backend:
+	@echo "Running backend tests..."
+	docker exec -it online-cinema-backend npm run test

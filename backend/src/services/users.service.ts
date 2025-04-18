@@ -56,7 +56,7 @@ export class UsersService {
     try {
       const savedUser = await this.userRepository.save(newUser);
       const { passwordHash, ...userData } = savedUser;
-      return savedUser;
+      return userData;
     } catch (error) {
       console.error('Error saving user:', error);
       throw new InternalServerErrorException('Could not create user.');
@@ -107,7 +107,7 @@ export class UsersService {
     try {
       const savedUser = await this.userRepository.save(user);
       const { passwordHash, ...userData } = savedUser;
-      return savedUser;
+      return userData;
     } catch (error) {
       if (error.code === '23505') {
         throw new BadRequestException('Username or email already exists.');
