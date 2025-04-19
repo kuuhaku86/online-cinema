@@ -31,7 +31,7 @@ export class UsersService {
 
   async create(
     createUserDto: CreateUserDto,
-  ): Promise<Omit<User, 'passwordHash'>> {
+  ): Promise<Omit<User, 'passwordHash' | 'currentHashedRefreshToken'>> {
     const existingUser = await this.userRepository.findOne({
       where: [
         { email: createUserDto.email },
@@ -55,7 +55,8 @@ export class UsersService {
 
     try {
       const savedUser = await this.userRepository.save(newUser);
-      const { passwordHash, ...userData } = savedUser;
+      const { passwordHash, currentHashedRefreshToken, ...userData } =
+        savedUser;
       return userData;
     } catch (error) {
       console.error('Error saving user:', error);
@@ -82,7 +83,7 @@ export class UsersService {
   async update(
     id: string,
     updateUserDto: UpdateUserDto,
-  ): Promise<Omit<User, 'passwordHash'>> {
+  ): Promise<Omit<User, 'passwordHash' | 'currentHashedRefreshToken'>> {
     const updateData = { ...updateUserDto };
     let hashedPassword: string | undefined = undefined;
 
@@ -106,7 +107,8 @@ export class UsersService {
 
     try {
       const savedUser = await this.userRepository.save(user);
-      const { passwordHash, ...userData } = savedUser;
+      const { passwordHash, currentHashedRefreshToken, ...userData } =
+        savedUser;
       return userData;
     } catch (error) {
       if (error.code === '23505') {
@@ -120,5 +122,51 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     const user = await this.findOne(id);
     await this.userRepository.remove(user);
+  }
+
+  async setCurrentRefreshToken(
+    userId: string,
+    hashedRefreshToken: string,
+  ): Promise<void> {
+    try {
+      const updateResult = await this.userRepository.update(userId, {
+        currentHashedRefreshToken: hashedRefreshToken,
+      });
+
+      if (updateResult.affected === 0) {
+        throw new NotFoundException(
+          `User with ID "${userId}" not found for refresh token update.`,
+        );
+      }
+      console.log(`Refresh token updated for user ID: ${userId}`); // Optional logging
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('Error setting refresh token:', error);
+      throw new InternalServerErrorException('Could not update refresh token.');
+    }
+  }
+
+  async removeRefreshToken(userId: string): Promise<User | null> {
+    try {
+      const updateResult = await this.userRepository.update(userId, {
+        currentHashedRefreshToken: null,
+      });
+
+      if (updateResult.affected === 0) {
+        console.warn(
+          `User with ID "${userId}" not found during refresh token removal.`,
+        );
+        return null;
+      }
+
+      console.log(`Refresh token removed for user ID: ${userId}`);
+      const updatedUser = await this.findOne(userId);
+      return updatedUser;
+    } catch (error) {
+      console.error('Error removing refresh token:', error);
+      throw new InternalServerErrorException('Could not remove refresh token.');
+    }
   }
 }

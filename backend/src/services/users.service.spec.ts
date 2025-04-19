@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { UsersService } from './users.service';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/users/create-user.dto';
@@ -26,6 +26,7 @@ const createMockRepository = (): MockRepository<User> => ({
   findOneBy: jest.fn(),
   preload: jest.fn(),
   remove: jest.fn(),
+  update: jest.fn(),
 });
 
 describe('UsersService', () => {
@@ -37,6 +38,7 @@ describe('UsersService', () => {
     username: 'testuser',
     email: 'test@example.com',
     passwordHash: 'hashedPassword123',
+    currentHashedRefreshToken: 'hashedPassword123',
     name: 'Test User',
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -344,6 +346,134 @@ describe('UsersService', () => {
         NotFoundException,
       );
       expect(userRepository.remove).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('setCurrentRefreshToken', () => {
+    const userId = mockUser.id;
+    const hashedToken = 'newHashedRefreshToken';
+
+    it('should successfully update the refresh token hash', async () => {
+      const mockUpdateResult: UpdateResult = {
+        affected: 1,
+        raw: [],
+        generatedMaps: [],
+      };
+      userRepository.update!.mockResolvedValue(mockUpdateResult);
+
+      await expect(
+        service.setCurrentRefreshToken(userId, hashedToken),
+      ).resolves.toBeUndefined();
+
+      expect(userRepository.update).toHaveBeenCalledWith(userId, {
+        currentHashedRefreshToken: hashedToken,
+      });
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      const mockUpdateResult: UpdateResult = {
+        affected: 0,
+        raw: [],
+        generatedMaps: [],
+      };
+      userRepository.update!.mockResolvedValue(mockUpdateResult);
+
+      await expect(
+        service.setCurrentRefreshToken(userId, hashedToken),
+      ).rejects.toThrow(NotFoundException);
+      expect(userRepository.update).toHaveBeenCalledWith(userId, {
+        currentHashedRefreshToken: hashedToken,
+      });
+    });
+
+    it('should throw InternalServerErrorException on database error', async () => {
+      userRepository.update!.mockRejectedValue(
+        new Error('DB connection error'),
+      );
+
+      await expect(
+        service.setCurrentRefreshToken(userId, hashedToken),
+      ).rejects.toThrow(InternalServerErrorException);
+      expect(userRepository.update).toHaveBeenCalledWith(userId, {
+        currentHashedRefreshToken: hashedToken,
+      });
+    });
+  });
+
+  describe('removeRefreshToken', () => {
+    const userId = mockUser.id;
+
+    it('should successfully remove the refresh token and return the user', async () => {
+      const mockUpdateResult: UpdateResult = {
+        affected: 1,
+        raw: [],
+        generatedMaps: [],
+      };
+      const updatedUser = { ...mockUser, currentHashedRefreshToken: null };
+
+      userRepository.update!.mockResolvedValue(mockUpdateResult);
+      jest.spyOn(service, 'findOne').mockResolvedValue(updatedUser);
+
+      const result = await service.removeRefreshToken(userId);
+
+      expect(userRepository.update).toHaveBeenCalledWith(userId, {
+        currentHashedRefreshToken: null,
+      });
+      expect(service.findOne).toHaveBeenCalledWith(userId);
+      expect(result).toEqual(updatedUser);
+    });
+
+    it('should return null if user not found during update', async () => {
+      const mockUpdateResult: UpdateResult = {
+        affected: 0,
+        raw: [],
+        generatedMaps: [],
+      };
+      userRepository.update!.mockResolvedValue(mockUpdateResult);
+      jest.spyOn(service, 'findOne');
+
+      const result = await service.removeRefreshToken(userId);
+
+      expect(userRepository.update).toHaveBeenCalledWith(userId, {
+        currentHashedRefreshToken: null,
+      });
+      expect(service.findOne).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+
+    it('should throw InternalServerErrorException on update error', async () => {
+      userRepository.update!.mockRejectedValue(
+        new Error('DB connection error'),
+      );
+      jest.spyOn(service, 'findOne');
+
+      await expect(service.removeRefreshToken(userId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      expect(userRepository.update).toHaveBeenCalledWith(userId, {
+        currentHashedRefreshToken: null,
+      });
+      expect(service.findOne).not.toHaveBeenCalled();
+    });
+
+    it('should throw InternalServerErrorException if findOne fails after successful update', async () => {
+      const mockUpdateResult: UpdateResult = {
+        affected: 1,
+        raw: [],
+        generatedMaps: [],
+      };
+      userRepository.update!.mockResolvedValue(mockUpdateResult);
+      jest
+        .spyOn(service, 'findOne')
+        .mockRejectedValue(new Error('Find failed'));
+
+      await expect(service.removeRefreshToken(userId)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      expect(userRepository.update).toHaveBeenCalledWith(userId, {
+        currentHashedRefreshToken: null,
+      });
+      expect(service.findOne).toHaveBeenCalledWith(userId);
     });
   });
 });
