@@ -24,10 +24,7 @@ export class AuthService {
   async validateUser(
     email: string,
     pass: string,
-  ): Promise<Omit<
-    Omit<User, 'passwordHash'>,
-    'currentHashedRefreshToken'
-  > | null> {
+  ): Promise<Omit<User, 'passwordHash' | 'currentHashedRefreshToken'> | null> {
     const user = await this.usersService.findByEmail(email);
 
     if (user && (await bcrypt.compare(pass, user.passwordHash))) {
