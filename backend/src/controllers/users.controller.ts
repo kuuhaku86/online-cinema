@@ -18,7 +18,7 @@ export class UsersController {
   @Get(':id')
   async getUser(
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<Omit<User, 'passwordHash'>> {
+  ): Promise<Omit<User, 'passwordHash' | 'currentHashedRefreshToken'>> {
     console.log(`Fetching user with ID: ${id}`);
     const user = await this.usersService.findOne(id);
 
@@ -27,7 +27,7 @@ export class UsersController {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...result } = user;
+    const { passwordHash, currentHashedRefreshToken, ...result } = user;
     return result;
   }
 }

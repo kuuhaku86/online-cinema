@@ -22,7 +22,7 @@ services:
     networks:
       - online-cinema-net
     volumes:
-      - ./backend/src:/app/src
+      - ./backend:/app
 
   frontend:
     build: ./frontend

@@ -29,5 +29,9 @@ test-backend:
 	@echo "Running backend tests..."
 	docker exec -it online-cinema-backend npm run test
 
+test-backend-e2e:
+	@echo "Running e2e backend tests..."
+	docker exec -it online-cinema-backend npm run test:e2e
+
 ssh-backend:
 	docker exec -it online-cinema-backend bash

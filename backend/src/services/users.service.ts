@@ -3,6 +3,7 @@ import {
   NotFoundException,
   InternalServerErrorException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -39,7 +40,7 @@ export class UsersService {
       ],
     });
     if (existingUser) {
-      throw new BadRequestException('Username or email already exists.');
+      throw new ConflictException('Username or email already exists.');
     }
 
     const hashedPassword = await this.hashPassword(createUserDto.password);
