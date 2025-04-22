@@ -30,11 +30,13 @@ describe('UsersController', () => {
     updatedAt: new Date(),
   };
 
-  const mockUserResult: Omit<User, 'passwordHash'> = {
+  const mockUserResult: Omit<
+    User,
+    'passwordHash' | 'currentHashedRefreshToken'
+  > = {
     id: mockUserId,
     username: 'testuser',
     email: 'test@example.com',
-    currentHashedRefreshToken: 'secretRefreshTokenHash',
     name: 'Test User',
     createdAt: mockUser.createdAt,
     updatedAt: mockUser.updatedAt,

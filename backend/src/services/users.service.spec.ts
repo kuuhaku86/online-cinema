@@ -7,6 +7,7 @@ import { CreateUserDto } from '../dto/users/create-user.dto';
 import { UpdateUserDto } from '../dto/users/update-user.dto';
 import {
   BadRequestException,
+  ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -115,7 +116,7 @@ describe('UsersService', () => {
       userRepository.findOne!.mockResolvedValue(mockUser);
 
       await expect(service.create(mockCreateUserDto)).rejects.toThrow(
-        BadRequestException,
+        ConflictException,
       );
       expect(userRepository.save).not.toHaveBeenCalled();
       expect(bcrypt.hash).not.toHaveBeenCalled();

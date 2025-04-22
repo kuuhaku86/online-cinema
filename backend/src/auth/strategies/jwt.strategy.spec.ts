@@ -64,11 +64,13 @@ describe('JwtStrategy', () => {
   describe('validate', () => {
     it('should return the payload if user exists', async () => {
       usersService.findOne.mockResolvedValue(mockUser);
+      const { passwordHash, currentHashedRefreshToken, ...mockResult } =
+        mockUser;
 
       const result = await strategy.validate(validPayload);
 
       expect(usersService.findOne).toHaveBeenCalledWith(validPayload.sub);
-      expect(result).toEqual(validPayload);
+      expect(result).toEqual(mockResult);
     });
 
     it('should throw UnauthorizedException if user does not exist', async () => {
