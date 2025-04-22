@@ -39,14 +39,14 @@ describe('AuthController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     // Apply validation pipe globally to match main.ts/app setup
-    // app.useGlobalPipes(
-    //   new ValidationPipe({
-    //     whitelist: true, // Strips properties not in DTO
-    //     transform: true, // Transforms payload to DTO instance
-    //     forbidNonWhitelisted: true, // Throws error if non-whitelisted properties are present
-    //     validationError: { target: false }, // Optional: prevents sending target object back in error response
-    //   }),
-    // );
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+        validationError: { target: false },
+      }),
+    );
     await app.init();
 
     dataSource = moduleFixture.get<DataSource>(DataSource);
@@ -108,8 +108,6 @@ describe('AuthController (e2e)', () => {
     });
 
     it('should return 400 Bad Request for invalid registration data (e.g., missing fields)', async () => {
-      // const invalidData = { ...userCredentials };
-      // delete invalidData.password;
       const { password, ...invalidData } = generateCredentials(
         uniqueSuffix + '_invalid',
       );
@@ -174,12 +172,12 @@ describe('AuthController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/auth/login')
         .send({ email: userCredentials.email })
-        .expect(HttpStatus.BAD_REQUEST);
+        .expect(HttpStatus.UNAUTHORIZED);
 
       await request(app.getHttpServer())
         .post('/auth/login')
         .send({ password: userCredentials.password })
-        .expect(HttpStatus.BAD_REQUEST);
+        .expect(HttpStatus.UNAUTHORIZED);
     });
   });
 
@@ -189,7 +187,7 @@ describe('AuthController (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .post('/auth/refresh')
-        .set('Authorization', `Bearer ${refreshToken}`)
+        .send({ refresh_token: refreshToken })
         .expect(HttpStatus.OK); // 200
 
       expect(response.body).toBeDefined();
@@ -205,7 +203,7 @@ describe('AuthController (e2e)', () => {
     it('should return 401 Unauthorized when using an invalid refresh token', async () => {
       await request(app.getHttpServer())
         .post('/auth/refresh')
-        .set('Authorization', 'Bearer invalidrefreshtoken')
+        .send({ refresh_token: 'invalidrefreshtoken' })
         .expect(HttpStatus.UNAUTHORIZED);
     });
 
@@ -218,7 +216,7 @@ describe('AuthController (e2e)', () => {
     it('should return 401 Unauthorized when using an access token instead of a refresh token', async () => {
       await request(app.getHttpServer())
         .post('/auth/refresh')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ refresh_token: accessToken })
         .expect(HttpStatus.UNAUTHORIZED);
     });
   });

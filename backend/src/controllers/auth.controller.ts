@@ -12,16 +12,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { CreateUserDto } from '../dto/users/create-user.dto';
 import { UsersService } from '../services/users.service';
+import { User } from '../entities/user.entity';
 
 interface RequestWithUser extends Request {
-  user: {
-    id: string;
-    username: string;
-    email: string;
-    name: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
+  user: Omit<User, 'passwordHash' | 'currentHashedRefreshToken'>;
 }
 
 interface RequestWithRefreshTokenPayload extends Request {

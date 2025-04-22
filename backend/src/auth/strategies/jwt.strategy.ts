@@ -2,6 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../../services/users.service';
+import { User } from 'src/entities/user.entity';
 
 interface JwtPayload {
   sub: string;
@@ -19,7 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload): Promise<JwtPayload> {
+  async validate(
+    payload: JwtPayload,
+  ): Promise<Omit<User, 'passwordHash' | 'currentHashedRefreshToken'>> {
     console.log('JwtStrategy: Validating JWT payload:', payload);
 
     if (!payload || !payload.sub) {
@@ -32,6 +35,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('User not found');
     }
 
-    return payload;
+    return user;
   }
 }
