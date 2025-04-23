@@ -33,6 +33,8 @@ services:
       - backend
     networks:
       - online-cinema-net
+    volumes:
+      - ./frontend:/app
 
   db:
     image: postgres:15
