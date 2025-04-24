@@ -23,18 +23,24 @@ services:
       - online-cinema-net
     volumes:
       - ./backend:/app
+      - /app/node_modules
 
   frontend:
     build: ./frontend
     container_name: online-cinema-frontend
     ports:
-      - "8080:80"
+      - "5173:5173"
     depends_on:
       - backend
     networks:
       - online-cinema-net
     volumes:
       - ./frontend:/app
+      - /app/node_modules
+    command: yarn dev
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_SERVER_HOST=true
 
   db:
     image: postgres:15
