@@ -1,0 +1,58 @@
+.navbar {
+  background-color: #333;
+  padding: 10px 20px;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.navContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.navLogoLink {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.navLogoImage {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+.navMenu {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem {
+  margin-left: 20px;
+}
+
+.navLink {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 10px;
+  transition: background-color 0.3s ease;
+}
+
+.navLink:hover,
+.navLink:focus {
+  background-color: #FF4E4E;
+  color: #fff;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+}

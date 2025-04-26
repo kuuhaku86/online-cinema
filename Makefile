@@ -35,3 +35,6 @@ test-backend-e2e:
 
 ssh-backend:
 	docker exec -it online-cinema-backend bash
+
+ssh-frontend:
+	docker exec -it online-cinema-frontend bash
