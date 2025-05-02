@@ -7,14 +7,12 @@ import LoginForm from "./LoginForm"; // Import your Login form
 import RegisterForm from "./RegisterForm"; // Import your Register form
 
 const NavigationBar: React.FC = () => {
-  // State to control modal visibility
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   return (
     <>
       {" "}
-      {/* Use a Fragment to return multiple top-level elements */}
       <nav className={styles.navbar}>
         <div className={styles.navContainer}>
           <Link to="/" className={styles.navLogoLink}>
@@ -27,10 +25,9 @@ const NavigationBar: React.FC = () => {
           </Link>
           <ul className={styles.navMenu}>
             <li className={styles.navItem}>
-              {/* Use buttons to open modals instead of Links */}
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className={styles.navLink} // Reuse link styling or create new button styles
+                className={styles.navLink}
               >
                 Login/Register
               </button>
@@ -38,7 +35,6 @@ const NavigationBar: React.FC = () => {
           </ul>
         </div>
       </nav>
-      {/* Login Modal */}
       <Modal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
@@ -51,7 +47,6 @@ const NavigationBar: React.FC = () => {
           }}
         />
       </Modal>
-      {/* Register Modal */}
       <Modal
         isOpen={isRegisterModalOpen}
         onClose={() => setIsRegisterModalOpen(false)}

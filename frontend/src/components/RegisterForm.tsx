@@ -16,26 +16,68 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onClose, onSwitch }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Register</h2>
       <div>
-        <label htmlFor="register-username">Username:</label>
-        <input type="text" id="register-username" required />
+        <label
+          htmlFor="register-username"
+          className="block mb-2 text-lg font-medium text-gray-900 dark:text-white"
+        >
+          Username:
+        </label>
+        <input
+          type="text"
+          id="register-username"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          required
+        />
       </div>
-      <div>
-        <label htmlFor="register-email">Email:</label>
-        <input type="email" id="register-email" required />
+      <div className="mt-4 text">
+        <label
+          htmlFor="register-email"
+          className="block mb-2 text-lg font-medium text-gray-900 dark:text-white"
+        >
+          Email:
+        </label>
+        <input
+          type="email"
+          id="register-email"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          required
+        />
       </div>
-      <div>
-        <label htmlFor="register-password">Password:</label>
-        <input type="password" id="register-password" required />
+      <div className="mt-4 text">
+        <label
+          htmlFor="register-password"
+          className="block mb-2 text-lg font-medium text-gray-900 dark:text-white"
+        >
+          Password:
+        </label>
+        <input
+          type="password"
+          id="register-password"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="••••••••"
+          required
+        />
       </div>
-      <button type="submit">Register</button>
-      {onClose && (
-        <button type="button" onClick={onClose}>
-          Cancel
-        </button>
-      )}
-      <div>
+      <div className="mt-4 text">
+        <label
+          htmlFor="register-confirm-password"
+          className="block mb-2 text-lg font-medium text-gray-900 dark:text-white"
+        >
+          Confirm Password:
+        </label>
+        <input
+          type="password"
+          id="register-confirm-password"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="••••••••"
+          required
+        />
+      </div>
+      <button className="mt-4 text" type="submit">
+        Register
+      </button>
+      <div className="mt-4 text">
         Already have an account? <a onClick={onSwitch}>Switch to Login</a>
       </div>
     </form>
