@@ -1,17 +1,29 @@
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store";
-import { login, logout } from "../features/auth/authSlice";
+import { AppDispatch, RootState } from "../store";
+import {
+  login,
+  logout,
+  register,
+  LoginCredentials,
+  RegisterCredentials,
+} from "../features/auth/authSlice";
 import { useCallback } from "react";
 
 export const useAuth = () => {
-  const dispatch = useDispatch();
-  const { user, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const dispatch = useDispatch<AppDispatch>();
+  const { user, isAuthenticated, loading, error, registrationStatus } =
+    useSelector((state: RootState) => state.auth);
 
   const signIn = useCallback(
-    (userData: typeof user) => {
-      if (userData) dispatch(login(userData));
+    (credentials: LoginCredentials) => {
+      dispatch(login(credentials));
+    },
+    [dispatch]
+  );
+
+  const signUp = useCallback(
+    (credentials: RegisterCredentials) => {
+      dispatch(register(credentials));
     },
     [dispatch]
   );
@@ -23,7 +35,11 @@ export const useAuth = () => {
   return {
     user,
     isAuthenticated,
+    loading,
+    error,
     signIn,
     signOut,
+    registrationStatus,
+    signUp,
   };
 };

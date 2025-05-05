@@ -37,7 +37,13 @@ export class AuthService {
 
   async login(
     user: Omit<User, 'passwordHash' | 'currentHashedRefreshToken'>,
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  ): Promise<{
+    id: string;
+    username: string;
+    email: string;
+    access_token: string;
+    refresh_token: string;
+  }> {
     const accessTokenPayload: AccessTokenPayload = {
       sub: user.id,
       username: user.username,
@@ -59,6 +65,9 @@ export class AuthService {
     await this.updateRefreshTokenHash(user.id, refreshToken);
 
     return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
       access_token: accessToken,
       refresh_token: refreshToken,
     };
