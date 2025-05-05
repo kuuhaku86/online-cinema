@@ -4,7 +4,7 @@ import {
   User,
 } from "../features/auth/authSlice";
 
-const API_BASE_URL = "/auth";
+const API_BASE_URL = import.meta.env.VITE_API_HOST + "/auth";
 
 export const login = async (credentials: LoginCredentials): Promise<User> => {
   const response = await fetch(`${API_BASE_URL}/login`, {
