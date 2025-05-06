@@ -183,6 +183,7 @@ describe('AuthController (e2e)', () => {
 
   describe('/auth/refresh (POST)', () => {
     it('should refresh tokens successfully using a valid refresh token', async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       expect(refreshToken).toBeDefined();
 
       const response = await request(app.getHttpServer())
