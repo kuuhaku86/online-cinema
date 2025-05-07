@@ -21,9 +21,9 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+  @Matches(/^(?=.*[a-zA-Z])(?=.*\d).{6,}$/, {
     message:
-      'Password too weak. It must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+      'Password must be at least 6 characters long and contain at least one letter and one number',
   })
   readonly password: string;
 

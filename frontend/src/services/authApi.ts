@@ -23,7 +23,7 @@ export const login = async (credentials: LoginCredentials): Promise<User> => {
   }
 
   const data = await response.json();
-  return data.user;
+  return data;
 };
 
 export const register = async (
