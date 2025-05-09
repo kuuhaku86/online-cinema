@@ -6,7 +6,7 @@ const MainLayout: React.FC = () => {
   return (
     <div>
       <NavigationBar />
-      <main className="p-5">
+      <main>
         {" "}
         <Outlet />
       </main>
