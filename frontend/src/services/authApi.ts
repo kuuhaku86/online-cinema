@@ -47,3 +47,28 @@ export const register = async (
 
   return await response.json();
 };
+
+export const logout = async (accessToken: string): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/logout`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    let errorMessage = `Logout failed with status: ${response.status}`;
+    try {
+      const errorData = await response.json();
+      if (errorData && errorData.message) {
+        errorMessage = Array.isArray(errorData.message)
+          ? errorData.message.join(", ")
+          : errorData.message;
+      }
+    } catch (e) {
+      console.error("Error parsing JSON:", e);
+    }
+    throw new Error(errorMessage);
+  }
+};

@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import * as authApi from "../../services/authApi";
+import { RootState } from "../../store"; // Import RootState for getState type
 
 export interface LoginCredentials {
   email: string;
@@ -56,6 +57,33 @@ export const register = createAsyncThunk<
   }
 });
 
+export const logout = createAsyncThunk<
+  void,
+  void,
+  { rejectValue: string; state: RootState }
+>("auth/logout", async (_, { getState, rejectWithValue }) => {
+  const token = getState().auth.user?.access_token;
+  let apiError: any = null;
+
+  if (token) {
+    try {
+      await authApi.logout(token);
+    } catch (error: any) {
+      apiError = error;
+      console.error("Server logout API call failed:", error.message);
+    }
+  }
+
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+
+  if (apiError) {
+    return rejectWithValue(
+      apiError.message || "Server logout failed, but client state cleared."
+    );
+  }
+});
+
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
@@ -67,17 +95,7 @@ const initialState: AuthState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.isAuthenticated = false;
-      state.loading = "idle";
-      state.error = null;
-      state.registrationStatus = "idle";
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
@@ -98,24 +116,37 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
       })
-      // Handle registration lifecycle
       .addCase(register.pending, (state) => {
         state.registrationStatus = "pending";
-        state.error = null; // Clear previous errors
+        state.error = null;
       })
       .addCase(register.fulfilled, (state, action) => {
         state.registrationStatus = "succeeded";
         state.error = null;
-        // Decide if registration should automatically log the user in.
-        // If not, we just set the status. The user can then log in separately.
-        // console.log('Registration successful:', action.payload);
       })
       .addCase(register.rejected, (state, action) => {
         state.registrationStatus = "failed";
         state.error = action.payload;
+      })
+      .addCase(logout.pending, (state) => {
+        state.loading = "pending";
+        state.error = null;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
+        state.isAuthenticated = false;
+        state.loading = "idle";
+        state.error = null;
+        state.registrationStatus = "idle";
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.user = null;
+        state.isAuthenticated = false;
+        state.loading = "idle";
+        state.error = action.payload;
+        state.registrationStatus = "idle";
       });
   },
 });
 
-export const { logout } = authSlice.actions;
 export default authSlice.reducer;
