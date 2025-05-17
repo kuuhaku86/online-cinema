@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { UsersService } from '../../services/users.service';
 import { User } from 'src/entities/user.entity';
 
@@ -12,21 +12,26 @@ interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private static readonly logger = new Logger(JwtStrategy.name);
+
   constructor(private usersService: UsersService) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET environment variable is not set. JwtStrategy cannot be initialized.');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET ?? '',
+      secretOrKey: secret,
     });
   }
 
   async validate(
     payload: JwtPayload,
   ): Promise<Omit<User, 'passwordHash' | 'currentHashedRefreshToken'>> {
-    console.log('JwtStrategy: Validating JWT payload:', payload);
-
     if (!payload || !payload.sub) {
-      console.error('JwtStrategy: Invalid payload received.');
+      JwtStrategy.logger.warn('Invalid JWT payload received or "sub" is missing.');
       throw new UnauthorizedException('Invalid token payload');
     }
 

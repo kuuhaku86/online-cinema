@@ -14,9 +14,9 @@ services:
       - DB_PASSWORD=password
       - DB_NAME=onlinecinemadb
       - JWT_SECRET=test
-      - JWT_EXPIRATION=3600
+      - JWT_EXPIRATION=3600s
       - JWT_REFRESH_SECRET=test2
-      - JWT_REFRESH_EXPIRATION=3600
+      - JWT_REFRESH_EXPIRATION=3600s
     depends_on:
       - db
     networks:
