@@ -84,13 +84,75 @@ export const logout = createAsyncThunk<
   }
 });
 
-const initialState: AuthState = {
-  user: null,
-  isAuthenticated: false,
-  loading: "idle",
-  error: null,
-  registrationStatus: "idle",
+const decodeTokenAndCheckExpiry = (
+  token: string
+): { id: string; username: string; email: string } | null => {
+  try {
+    const payloadBase64Url = token.split(".")[1];
+    if (!payloadBase64Url) {
+      return null;
+    }
+    const payloadBase64 = payloadBase64Url
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const decodedPayload = JSON.parse(atob(payloadBase64));
+
+    if (
+      decodedPayload &&
+      decodedPayload.exp &&
+      decodedPayload.sub &&
+      decodedPayload.username &&
+      decodedPayload.email
+    ) {
+      if (decodedPayload.exp * 1000 > Date.now()) {
+        return {
+          id: decodedPayload.sub,
+          username: decodedPayload.username,
+          email: decodedPayload.email,
+        };
+      }
+    }
+  } catch (error) {
+    console.error("Failed to decode or validate token:", error);
+  }
+  return null;
 };
+
+const getInitialAuthState = (): AuthState => {
+  const accessToken = localStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
+
+  if (accessToken && refreshToken) {
+    const decodedUserDetails = decodeTokenAndCheckExpiry(accessToken);
+
+    if (decodedUserDetails) {
+      return {
+        user: {
+          ...decodedUserDetails,
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        },
+        isAuthenticated: true,
+        loading: "idle",
+        error: null,
+        registrationStatus: "idle",
+      };
+    } else {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    }
+  }
+
+  return {
+    user: null,
+    isAuthenticated: false,
+    loading: "idle",
+    error: null,
+    registrationStatus: "idle",
+  };
+};
+
+const initialState: AuthState = getInitialAuthState();
 
 const authSlice = createSlice({
   name: "auth",
