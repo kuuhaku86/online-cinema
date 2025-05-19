@@ -6,6 +6,7 @@ import Modal from "./Modal";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import { useAuth } from "../hooks/useAuth";
+import { FaUserCircle, FaSignOutAlt, FaSignInAlt } from "react-icons/fa"; // Import icons
 
 const NavigationBar: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -29,15 +30,23 @@ const NavigationBar: React.FC = () => {
             {isAuthenticated ? (
               <>
                 {user && user.username && (
-                  <li className={styles.navItem}>
-                    <span className={`${styles.navLink} ${styles.navText}`}>
-                      Welcome, {user.username}
-                    </span>
+                  <li className={`${styles.navItem}`}>
+                    <button
+                      onClick={() => {
+                        console.log("Profile button clicked");
+                      }}
+                      className={`${styles.navLink} ${styles.navButtonWithIcon}`}
+                    >
+                      <FaUserCircle className={styles.navIcon} /> Profile
+                    </button>
                   </li>
                 )}
                 <li className={styles.navItem}>
-                  <button onClick={signOut} className={styles.navLink}>
-                    Logout
+                  <button
+                    onClick={signOut}
+                    className={`${styles.navLink} ${styles.navButtonWithIcon}`}
+                  >
+                    <FaSignOutAlt className={styles.navIcon} /> Logout
                   </button>
                 </li>
               </>
@@ -45,9 +54,9 @@ const NavigationBar: React.FC = () => {
               <li className={styles.navItem}>
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
-                  className={styles.navLink}
+                  className={`${styles.navLink} ${styles.navButtonWithIcon}`}
                 >
-                  Login/Register
+                  <FaSignInAlt className={styles.navIcon} /> Login/Register
                 </button>
               </li>
             )}

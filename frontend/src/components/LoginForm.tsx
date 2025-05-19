@@ -19,7 +19,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose, onSwitch }) => {
 
   if (isAuthenticated) {
     return (
-      <p className="mt-2 text-green-500 text-sm">You are already logged in.</p>
+      <p className="mt-2 text-white text-sm">You are already logged in.</p>
     );
   }
 

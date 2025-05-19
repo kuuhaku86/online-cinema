@@ -25,7 +25,6 @@
 .navLogoImage {
   height: 40px;
   width: auto;
-  display: block;
 }
 
 .navMenu {
@@ -36,7 +35,7 @@
 }
 
 .navItem {
-  margin-left: 20px;
+  margin-left: 1.5rem;
 }
 
 .navLink {
@@ -45,6 +44,11 @@
   text-decoration: none;
   padding: 5px 10px;
   transition: background-color 0.3s ease;
+  -webkit-transition: background-color 0.3s ease;
+  -moz-transition: background-color 0.3s ease;
+  -ms-transition: background-color 0.3s ease;
+  -o-transition: background-color 0.3s ease;
+  font-family: inherit;
 }
 
 .navLink:hover,
@@ -56,4 +60,16 @@
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
   -o-border-radius: 4px;
+}
+
+.navButtonWithIcon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* Space between icon and text */
+}
+
+.navIcon {
+  font-size: 1.2em;
+  /* Adjust icon size as needed */
 }
