@@ -31,20 +31,18 @@ const NavigationBar: React.FC = () => {
               <>
                 {user && user.username && (
                   <li className={`${styles.navItem}`}>
-                    <button
-                      onClick={() => {
-                        console.log("Profile button clicked");
-                      }}
-                      className={`${styles.navLink} ${styles.navButtonWithIcon}`}
+                    <Link
+                      to="/profile"
+                      className={`${styles.navLink} ${styles.navButtonWithIcon} rounded-md`}
                     >
                       <FaUserCircle className={styles.navIcon} /> Profile
-                    </button>
+                    </Link>
                   </li>
                 )}
                 <li className={styles.navItem}>
                   <button
                     onClick={signOut}
-                    className={`${styles.navLink} ${styles.navButtonWithIcon}`}
+                    className={`${styles.navLink} ${styles.navButtonWithIcon} rounded-md`}
                   >
                     <FaSignOutAlt className={styles.navIcon} /> Logout
                   </button>
