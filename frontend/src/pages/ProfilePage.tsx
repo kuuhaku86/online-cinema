@@ -15,6 +15,9 @@ const ProfilePage: React.FC = () => {
 
   const [username, setUsername] = useState(user?.username || "");
   const [email, setEmail] = useState(user?.email || "");
+  const [oldPassword, setOldPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   // Add state for other editable fields if available in user object, e.g.:
 
   // Update form state when user data changes (e.g., after initial load or successful update)
@@ -91,8 +94,25 @@ const ProfilePage: React.FC = () => {
             type="email"
             id="profile-email"
             className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            // value={email}
-            // onChange={(e) => setEmail(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mt-4 flex items-center">
+          <label
+            htmlFor="profile-old-password"
+            className="w-48 mr-4 text-lg font-medium text-gray-900 dark:text-white shrink-0 text-right"
+          >
+            Old Password:
+          </label>
+          <input
+            type="password"
+            id="profile-old-password"
+            className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="••••••••"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
             required
           />
         </div>
@@ -108,8 +128,8 @@ const ProfilePage: React.FC = () => {
             id="profile-new-password"
             className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="••••••••"
-            // value={password}
-            // onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
@@ -125,8 +145,8 @@ const ProfilePage: React.FC = () => {
             id="profile-confirm-new-password"
             className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="••••••••"
-            // value={confirmPassword}
-            // onChange={(e) => setConfirmPassword(e.target.value)}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
         </div>
