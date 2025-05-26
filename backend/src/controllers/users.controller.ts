@@ -15,6 +15,7 @@ import { User } from '../entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserDto } from '../dto/users/update-user.dto';
 import { Request } from 'express';
+import { AuthService } from '../services/auth.service';
 
 // This interface should ideally be in a shared types file.
 // It's based on the one in auth.controller.ts and assumes JWT strategy populates req.user similarly.
@@ -24,7 +25,7 @@ interface RequestWithAuthenticatedUser extends Request {
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')

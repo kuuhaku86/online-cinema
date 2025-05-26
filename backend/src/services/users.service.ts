@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   BadRequestException,
   ConflictException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +12,7 @@ import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/users/create-user.dto';
 import { UpdateUserDto } from '../dto/users/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +21,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly authService: AuthService,
   ) {}
 
   private async hashPassword(password: string): Promise<string> {
@@ -88,9 +91,17 @@ export class UsersService {
     const updateData = { ...updateUserDto };
     let hashedPassword: string | undefined = undefined;
 
-    if (updateData.password) {
-      hashedPassword = await this.hashPassword(updateData.password);
-      delete (updateData as any).password;
+
+    if (updateData.newPassword) {
+      const user = this.authService.validateUser(updateData.email, updateData.oldPassword);
+      if (!user) {
+        console.log(`Update: Validation failed for user ${updateData.email}`);
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      hashedPassword = await this.hashPassword(updateData.newPassword);
+      delete (updateData as any).newPassword;
+      delete (updateData as any).oldPassword;
     }
 
     const user = await this.userRepository.preload({
