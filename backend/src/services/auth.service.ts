@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { UsersService } from './users.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '../entities/user.entity';
@@ -17,7 +17,8 @@ interface RefreshTokenPayload {
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    @Inject(forwardRef(() => UsersService)) // Use forwardRef for UsersService injection
+    private usersService: UsersService, 
     private jwtService: JwtService,
   ) {}
 
