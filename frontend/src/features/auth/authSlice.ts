@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import * as authApi from "../../services/authApi";
-import { RootState } from "../../store"; // Import RootState for getState type
+import { RootState } from "../../store";
 
 export interface LoginCredentials {
   email: string;
@@ -157,7 +157,15 @@ const initialState: AuthState = getInitialAuthState();
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    setUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+
+      localStorage.setItem("accessToken", action.payload.access_token);
+      localStorage.setItem("refreshToken", action.payload.refresh_token);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
@@ -211,4 +219,5 @@ const authSlice = createSlice({
   },
 });
 
+export const { setUser } = authSlice.actions;
 export default authSlice.reducer;
