@@ -14,7 +14,7 @@ export const updateProfile = async (
   accessToken: string,
   userId: string
 ): Promise<User> => {
-  const response = await fetch(API_BASE_URL + userId, {
+  const response = await fetch(API_BASE_URL + "/" + userId, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

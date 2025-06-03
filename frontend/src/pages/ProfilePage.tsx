@@ -2,124 +2,218 @@ import React, { useState, useEffect } from "react";
 import { useProfile } from "../hooks/useProfile";
 
 const ProfilePage: React.FC = () => {
-  const { user, updateLoading, updateError, updateProfile, clearUpdateStatus } = useProfile();
+  const { user, updateLoading, updateError, updateProfile, clearUpdateStatus } =
+    useProfile();
 
-  // Local state for form inputs, initialized with user data
   const [username, setUsername] = useState(user?.username || "");
   const [email, setEmail] = useState(user?.email || "");
+  const [oldPassword, setOldPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
-  // Effect to update local state when user data changes (e.g., after a successful update)
   useEffect(() => {
     if (user) {
       setUsername(user.username);
       setEmail(user.email);
+      setPassword("");
+      setConfirmPassword("");
+      setOldPassword("");
     }
   }, [user]);
 
-  // Effect to clear update status when the component mounts or unmounts
   useEffect(() => {
-    // Clear status on mount to start fresh
     clearUpdateStatus();
-    // Clear status on unmount
     return () => {
       clearUpdateStatus();
     };
-  }, [clearUpdateStatus]); // Dependency array ensures this runs when clearUpdateStatus changes (unlikely, but good practice)
+  }, [clearUpdateStatus]);
 
-  // Effect to handle successful update feedback
   useEffect(() => {
-    if (updateLoading === 'succeeded') {
-      setIsEditing(false); // Exit editing mode on success
+    if (updateLoading === "succeeded") {
+      setIsEditing(false);
       // Optionally show a success message to the user (e.g., using a toast notification)
       console.log("Profile updated successfully!");
       // You might want to clear the status after a delay or user action
-      // clearUpdateStatus(); // Or clear it manually later if needed
+      clearUpdateStatus();
     }
-  }, [updateLoading]); // Depend on updateLoading status
+  }, [updateLoading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Prepare credentials to send, only including fields that have changed
-    const credentialsToSend: { username?: string; email?: string } = {};
-    if (username !== user?.username) {
-      credentialsToSend.username = username;
+    const credentialsToSend: {
+      username?: string;
+      email?: string;
+      newPassword?: string;
+      oldPassword?: string;
+    } = {};
+    credentialsToSend.username = username;
+    credentialsToSend.email = email;
+    console.log("HERE");
+    if (password.length > 0) {
+      if (password !== confirmPassword) {
+        setIsEditing(false);
+        clearUpdateStatus();
+        return;
+      }
+      credentialsToSend.newPassword = password;
+      credentialsToSend.oldPassword = oldPassword;
     }
-    if (email !== user?.email) {
-      credentialsToSend.email = email;
+    if (oldPassword.length > 0) {
+      credentialsToSend.oldPassword = oldPassword;
     }
 
-    // Only dispatch update if there are changes
     if (Object.keys(credentialsToSend).length > 0) {
       updateProfile(credentialsToSend);
     } else {
-      // No changes to submit, just exit editing mode
       setIsEditing(false);
-      clearUpdateStatus(); // Clear any previous state messages
+      clearUpdateStatus();
     }
   };
 
   if (!user) {
-    // Handle case where user is not logged in, maybe redirect to login or show a message
     return <div>Please log in to view your profile.</div>;
   }
 
   return (
-    <div>
-      <h1>Profile Page</h1>
+    <div className="container mx-auto p-8 mt-5 max-w-lg">
+      <h1 className="text-4xl font-bold text-center mb-8 dark:text-white">
+        Profile Page
+      </h1>
 
-      {/* Display loading, error, or success messages */}
-      {updateLoading === 'pending' && <div style={{ color: 'blue' }}>Updating profile...</div>}
-      {updateLoading === 'failed' && (
-        <div style={{ color: 'red' }}>Error: {updateError}</div>
+      {updateLoading === "pending" && (
+        <div style={{ color: "blue" }}>Updating profile...</div>
       )}
-       {updateLoading === 'succeeded' && (
-        <div style={{ color: 'green' }}>Profile updated successfully!</div>
+      {updateLoading === "failed" && (
+        <div style={{ color: "red" }}>Error: {updateError}</div>
+      )}
+      {updateLoading === "succeeded" && (
+        <div style={{ color: "green" }}>Profile updated successfully!</div>
       )}
 
       {isEditing ? (
         <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="username">Username:</label>
+          <div className="flex items-center">
+            <label
+              htmlFor="username"
+              className="w-48 mr-4 text-lg font-medium text-gray-900 dark:text-white shrink-0 text-right"
+            >
+              Username:
+            </label>
             <input
               id="username"
               type="text"
+              className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              disabled={updateLoading === 'pending'} // Disable input while loading
+              disabled={updateLoading === "pending"}
             />
           </div>
-          <div>
-            <label htmlFor="email">Email:</label>
+          <div className="mt-4 flex items-center">
+            <label
+              htmlFor="email"
+              className="w-48 mr-4 text-lg font-medium text-gray-900 dark:text-white shrink-0 text-right"
+            >
+              Email:
+            </label>
             <input
               id="email"
               type="email"
+              className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={updateLoading === 'pending'} // Disable input while loading
+              disabled={updateLoading === "pending"}
             />
           </div>
-          {/* Add fields for password change if needed, but handle securely */}
+          <div className="mt-4 flex items-center">
+            <label
+              htmlFor="old-password"
+              className="w-48 mr-4 text-lg font-medium text-gray-900 dark:text-white shrink-0 text-right"
+            >
+              Old Password:
+            </label>
+            <input
+              type="password"
+              id="old-password"
+              className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="••••••••"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              disabled={updateLoading === "pending"}
+              required={password.length > 0}
+            />
+          </div>
+          <div className="mt-4 flex items-center">
+            <label
+              htmlFor="new-password"
+              className="w-48 mr-4 text-lg font-medium text-gray-900 dark:text-white shrink-0 text-right"
+            >
+              New Password:
+            </label>
+            <input
+              type="password"
+              id="new-password"
+              className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={updateLoading === "pending"}
+            />
+          </div>
+          <div className="mt-4 flex items-center">
+            <label
+              htmlFor="confirm-new-password"
+              className="w-48 mr-4 text-lg font-medium text-gray-900 dark:text-white shrink-0 text-right"
+            >
+              Confirm Password:
+            </label>
+            <input
+              type="password"
+              id="confirm-new-password"
+              className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={updateLoading === "pending"}
+              required={password.length > 0}
+            />
+          </div>
 
-          <button type="submit" disabled={updateLoading === 'pending'}>
-            {updateLoading === 'pending' ? "Saving..." : "Save Changes"}
-          </button>
-          <button type="button" onClick={() => {
-            // Reset form state to current user data and exit editing
-            setUsername(user.username);
-            setEmail(user.email);
-            setIsEditing(false);
-            clearUpdateStatus(); // Clear any previous error/success state
-          }} disabled={updateLoading === 'pending'}>
-            Cancel
-          </button>
+          <div className="mt-2">
+            <button
+              type="submit"
+              className="mr-2"
+              disabled={updateLoading === "pending"}
+            >
+              {updateLoading === "pending" ? "Saving..." : "Save Changes"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUsername(user.username);
+                setEmail(user.email);
+                setOldPassword("");
+                setPassword("");
+                setConfirmPassword("");
+                setIsEditing(false);
+                clearUpdateStatus();
+              }}
+              disabled={updateLoading === "pending"}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       ) : (
         <div>
-          <p><strong>Username:</strong> {user.username}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-          {/* Add other profile details here */}
+          <p>
+            <strong>Username:</strong> {user.username}
+          </p>
+          <p>
+            <strong>Email:</strong> {user.email}
+          </p>
           <button onClick={() => setIsEditing(true)}>Edit Profile</button>
         </div>
       )}
