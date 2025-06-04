@@ -11,7 +11,12 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.enableCors();
+  app.enableCors({
+    origin: /^http:\/\/localhost:\d+$/,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
+  });
   app.setGlobalPrefix('api');
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
