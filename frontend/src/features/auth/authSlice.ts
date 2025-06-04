@@ -159,11 +159,9 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
+      state.user!.email = action.payload.email;
+      state.user!.username = action.payload.username;
       state.isAuthenticated = true;
-
-      localStorage.setItem("accessToken", action.payload.access_token);
-      localStorage.setItem("refreshToken", action.payload.refresh_token);
     },
   },
   extraReducers: (builder) => {
