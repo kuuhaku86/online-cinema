@@ -34,15 +34,16 @@ const ProfilePage: React.FC = () => {
       setIsEditing(false);
       // Optionally show a success message to the user (e.g., using a toast notification)
       console.log("Profile updated successfully!");
-      // You might want to clear the status after a delay or user action
       clearUpdateStatus();
+      setPassword("");
+      setConfirmPassword("");
+      setOldPassword("");
     }
   }, [updateLoading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Prepare credentials to send, only including fields that have changed
     const credentialsToSend: {
       username?: string;
       email?: string;
@@ -51,7 +52,6 @@ const ProfilePage: React.FC = () => {
     } = {};
     credentialsToSend.username = username;
     credentialsToSend.email = email;
-    console.log("HERE");
     if (password.length > 0) {
       if (password !== confirmPassword) {
         setIsEditing(false);

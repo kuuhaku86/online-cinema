@@ -96,7 +96,7 @@ export class UsersService {
 
 
     if (updateData.newPassword) {
-      const user = this.authService.validateUser(updateData.email, updateData.oldPassword);
+      const user = await this.authService.validateUser(updateData.email, updateData.oldPassword);
       if (!user) {
         console.log(`Update: Validation failed for user ${updateData.email}`);
         throw new UnauthorizedException('Invalid credentials');
