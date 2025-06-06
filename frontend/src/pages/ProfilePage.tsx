@@ -208,13 +208,39 @@ const ProfilePage: React.FC = () => {
         </form>
       ) : (
         <div>
-          <p>
-            <strong>Username:</strong> {user.username}
-          </p>
-          <p>
-            <strong>Email:</strong> {user.email}
-          </p>
-          <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+          <div className="flex items-center">
+            <label
+              htmlFor="username"
+              className="w-48 mr-4 text-lg font-medium text-gray-900 dark:text-white shrink-0 text-right"
+            >
+              Username:
+            </label>
+            <input
+              id="username"
+              type="text"
+              className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              value={username}
+              disabled
+            />
+          </div>
+          <div className="mt-4 flex items-center">
+            <label
+              htmlFor="email"
+              className="w-48 mr-4 text-lg font-medium text-gray-900 dark:text-white shrink-0 text-right"
+            >
+              Email:
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              value={email}
+              disabled
+            />
+          </div>
+          <button className="mt-4" onClick={() => setIsEditing(true)}>
+            Edit Profile
+          </button>
         </div>
       )}
     </div>
