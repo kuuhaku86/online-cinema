@@ -10,8 +10,10 @@ import {
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { AuthService } from './auth.service';
 
 jest.mock('bcrypt');
 
@@ -33,6 +35,10 @@ const createMockRepository = (): MockRepository<User> => ({
 describe('UsersService', () => {
   let service: UsersService;
   let userRepository: MockRepository<User>;
+  let mockAuthService: Partial<Record<keyof AuthService, jest.Mock>>;
+
+  const mockUserPassword = 'Password123!'; // Consistent password for mockUser
+
 
   const mockUser: User = {
     id: 'some-uuid',
@@ -45,10 +51,20 @@ describe('UsersService', () => {
     updatedAt: new Date(),
   };
 
+  const mockUserWithoutSensitiveData: Omit<User, 'passwordHash' | 'currentHashedRefreshToken'> = {
+    id: mockUser.id,
+    username: mockUser.username,
+    email: mockUser.email,
+    name: mockUser.name,
+    createdAt: mockUser.createdAt,
+    updatedAt: mockUser.updatedAt,
+  };
+
+
   const mockCreateUserDto: CreateUserDto = {
     username: 'newuser',
     email: 'new@example.com',
-    password: 'Password123!',
+    password: mockUserPassword,
     name: 'New User',
   };
 
@@ -60,10 +76,14 @@ describe('UsersService', () => {
           provide: getRepositoryToken(User),
           useValue: createMockRepository(),
         },
+        {
+          provide: AuthService,
+          useValue: { validateUser: jest.fn() }, // Mock AuthService
+        },
       ],
     }).compile();
-
     service = module.get<UsersService>(UsersService);
+    mockAuthService = module.get(AuthService);
     userRepository = module.get<MockRepository<User>>(getRepositoryToken(User));
 
     jest.clearAllMocks();
@@ -217,86 +237,114 @@ describe('UsersService', () => {
   });
 
   describe('update', () => {
-    const updateDtoWithName: UpdateUserDto = { name: 'Updated Name' };
-    const updateDtoWithPass: UpdateUserDto = { password: 'NewPassword123!' };
+    const updateDtoWithName: UpdateUserDto = { username: 'Updated Username', email: mockUser.email, oldPassword:  '', newPassword: '' };
+    const updateDtoWithPass: UpdateUserDto = { username: mockUser.username, email: mockUser.email, oldPassword:  mockUserPassword, newPassword: 'NewPassword123!' };
     const updateDtoWithBoth: UpdateUserDto = {
-      name: 'Updated Name Again',
-      password: 'AnotherPassword123!',
+      username: 'Updated Username Again',
+      email: mockUser.email,
+      oldPassword: mockUserPassword,
+      newPassword: 'AnotherPassword123!',
     };
 
     it('should successfully update user data (without password)', async () => {
-      const preloadedUser = { ...mockUser };
-      const expectedSavedUser = {
-        ...mockUser,
-        name: updateDtoWithName.name,
-        updatedAt: new Date(),
+      // Preload should return the user with updated fields (if any non-password fields changed)
+      const userAfterPreload = { ...mockUser, username: updateDtoWithName.username, email: updateDtoWithName.email };
+      const expectedSavedUser = { // This is what save is expected to be called with
+        ...userAfterPreload, // It should be based on the preloaded user
+        // passwordHash and currentHashedRefreshToken remain from userAfterPreload (which is from mockUser)
+        updatedAt: expect.any(Date), // Allow any date for updatedAt
       };
-
-      userRepository.preload!.mockResolvedValue(preloadedUser);
+      userRepository.preload!.mockResolvedValue(userAfterPreload);
       userRepository.save!.mockResolvedValue(expectedSavedUser);
 
       const result = await service.update(mockUser.id, updateDtoWithName);
 
       expect(userRepository.preload).toHaveBeenCalledWith({
         id: mockUser.id,
-        ...updateDtoWithName,
+        username: updateDtoWithName.username, // DTO after password fields are removed
+        email: updateDtoWithName.email,
+        newPassword: '',
+        oldPassword: ''
       });
+      // authService.validateUser should not be called if newPassword is empty
+      expect(mockAuthService.validateUser).not.toHaveBeenCalled();
       expect(bcrypt.hash).not.toHaveBeenCalled();
-      expect(userRepository.save).toHaveBeenCalledWith(preloadedUser);
+      expect(userRepository.save).toHaveBeenCalledWith(userAfterPreload); // save is called with the mutated preloadedUser
       expect(result).toEqual(
-        expect.objectContaining({ name: updateDtoWithName.name }),
+        expect.objectContaining({ username: updateDtoWithName.username }),
       );
       expect(result).not.toHaveProperty('passwordHash');
     });
 
     it('should successfully update user data (with password)', async () => {
+      mockAuthService.validateUser!.mockResolvedValue(mockUserWithoutSensitiveData);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('newHashedPassword');
+
       const preloadedUser = { ...mockUser };
       const expectedSavedUser = {
         ...mockUser,
         passwordHash: 'newHashedPassword',
         updatedAt: new Date(),
       };
-      (bcrypt.hash as jest.Mock).mockResolvedValue('newHashedPassword');
 
       userRepository.preload!.mockResolvedValue(preloadedUser);
       userRepository.save!.mockResolvedValue(expectedSavedUser);
 
       const result = await service.update(mockUser.id, updateDtoWithPass);
 
-      expect(userRepository.preload).toHaveBeenCalledWith({ id: mockUser.id });
-      expect(bcrypt.hash).toHaveBeenCalledWith(updateDtoWithPass.password, 10);
+      expect(mockAuthService.validateUser).toHaveBeenCalledWith(updateDtoWithPass.email, updateDtoWithPass.oldPassword);
+      expect(userRepository.preload).toHaveBeenCalledWith({
+        id: mockUser.id,
+        username: updateDtoWithPass.username, // from updateData after password removal
+        email: updateDtoWithPass.email
+      });
+      expect(bcrypt.hash).toHaveBeenCalledWith(updateDtoWithPass.newPassword, 10);
       expect(preloadedUser.passwordHash).toEqual('newHashedPassword');
       expect(userRepository.save).toHaveBeenCalledWith(preloadedUser);
       expect(result).not.toHaveProperty('passwordHash');
+      expect(result.username).toEqual(mockUser.username); // Username shouldn't change with this DTO
     });
 
     it('should successfully update user data (with name and password)', async () => {
-      const preloadedUser = { ...mockUser };
+      mockAuthService.validateUser!.mockResolvedValue(mockUserWithoutSensitiveData);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('anotherHashedPassword');
+
+      // Preload should return the user with non-password fields already updated
+      const userWithUpdatedUsername = { ...mockUser, username: updateDtoWithBoth.username, email: updateDtoWithBoth.email };
+
       const expectedSavedUser = {
-        ...mockUser,
-        name: updateDtoWithBoth.name,
+        ...userWithUpdatedUsername, // Start with the preloaded state
         passwordHash: 'anotherHashedPassword',
         updatedAt: new Date(),
       };
-      (bcrypt.hash as jest.Mock).mockResolvedValue('anotherHashedPassword');
 
-      userRepository.preload!.mockResolvedValue(preloadedUser);
+      userRepository.preload!.mockResolvedValue(userWithUpdatedUsername);
       userRepository.save!.mockResolvedValue(expectedSavedUser);
 
       const result = await service.update(mockUser.id, updateDtoWithBoth);
 
+      expect(mockAuthService.validateUser).toHaveBeenCalledWith(updateDtoWithBoth.email, updateDtoWithBoth.oldPassword);
       expect(userRepository.preload).toHaveBeenCalledWith({
         id: mockUser.id,
-        name: updateDtoWithBoth.name,
+        username: updateDtoWithBoth.username, // from updateData after password removal
+        email: updateDtoWithBoth.email,
       });
-      expect(bcrypt.hash).toHaveBeenCalledWith(updateDtoWithBoth.password, 10);
-      expect(preloadedUser.passwordHash).toEqual('anotherHashedPassword');
-      expect(preloadedUser.name).toEqual(mockUser.name);
-      expect(userRepository.save).toHaveBeenCalledWith(preloadedUser);
+      expect(bcrypt.hash).toHaveBeenCalledWith(updateDtoWithBoth.newPassword, 10);
+      // The object returned by preload is mutated
+      expect(userWithUpdatedUsername.passwordHash).toEqual('anotherHashedPassword');
+      expect(userRepository.save).toHaveBeenCalledWith(userWithUpdatedUsername);
       expect(result).toEqual(
-        expect.objectContaining({ name: updateDtoWithBoth.name }),
+        expect.objectContaining({ username: updateDtoWithBoth.username }),
       );
       expect(result).not.toHaveProperty('passwordHash');
+    });
+
+    it('should throw UnauthorizedException if password validation fails during update', async () => {
+      mockAuthService.validateUser!.mockResolvedValue(null); // Simulate failed validation
+      userRepository.preload!.mockResolvedValue({ ...mockUser }); // Preload would still find the user
+      await expect(service.update(mockUser.id, updateDtoWithPass)).rejects.toThrow(UnauthorizedException);
+      expect(bcrypt.hash).not.toHaveBeenCalled();
+      expect(userRepository.save).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException if user to update is not found', async () => {
@@ -314,7 +362,7 @@ describe('UsersService', () => {
       userRepository.save!.mockRejectedValue({ code: '23505' });
 
       await expect(
-        service.update(mockUser.id, { email: 'existing@example.com' }),
+        service.update(mockUser.id, { username: mockUser.username, email: 'existing@example.com', oldPassword: '', newPassword: '' }),
       ).rejects.toThrow(BadRequestException);
     });
 

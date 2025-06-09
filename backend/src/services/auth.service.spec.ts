@@ -157,6 +157,9 @@ describe('AuthService', () => {
       );
       expect(result).toEqual({
         access_token: 'mockAccessToken',
+        email: mockUser.email,
+        id: mockUser.id,
+        username: mockUser.username,
         refresh_token: 'mockRefreshToken',
       });
     });

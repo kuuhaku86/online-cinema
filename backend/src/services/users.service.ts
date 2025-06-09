@@ -94,7 +94,6 @@ export class UsersService {
     const updateData = { ...updateUserDto };
     let hashedPassword: string | undefined = undefined;
 
-
     if (updateData.newPassword) {
       const user = await this.authService.validateUser(updateData.email, updateData.oldPassword);
       if (!user) {

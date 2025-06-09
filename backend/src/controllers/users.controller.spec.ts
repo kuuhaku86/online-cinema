@@ -5,9 +5,13 @@ import { User } from '../entities/user.entity';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ParseUUIDPipe } from '@nestjs/common';
+import { AuthService } from '../services/auth.service';
 
 const mockUsersService = {
   findOne: jest.fn(),
+};
+
+const mockAuthService = {
 };
 
 const mockAuthGuard = {
@@ -17,6 +21,7 @@ const mockAuthGuard = {
 describe('UsersController', () => {
   let controller: UsersController;
   let usersService: typeof mockUsersService;
+  let authService: typeof mockAuthService;
 
   const mockUserId = 'a-valid-uuid';
   const mockUser: User = {
@@ -51,6 +56,10 @@ describe('UsersController', () => {
         {
           provide: UsersService,
           useValue: mockUsersService,
+        },
+        {
+          provide: AuthService,
+          useValue: mockAuthService,
         },
       ],
     })
