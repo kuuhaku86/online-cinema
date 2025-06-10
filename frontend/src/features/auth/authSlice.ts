@@ -27,6 +27,13 @@ interface AuthState {
   loading: "idle" | "pending" | "succeeded" | "failed";
   error: string | null | undefined;
   registrationStatus: "idle" | "pending" | "succeeded" | "failed";
+  refreshToken: string | null;
+}
+
+// This is the type for the payload of setTokens
+interface Tokens {
+  accessToken: string;
+  refreshToken?: string; // Optional if backend doesn't always rotate refresh tokens
 }
 
 export const login = createAsyncThunk<
@@ -67,7 +74,7 @@ export const logout = createAsyncThunk<
 
   if (token) {
     try {
-      await authApi.logout(token);
+      await authApi.logout();
     } catch (error: any) {
       apiError = error;
       console.error("Server logout API call failed:", error.message);
@@ -136,6 +143,7 @@ const getInitialAuthState = (): AuthState => {
         loading: "idle",
         error: null,
         registrationStatus: "idle",
+        refreshToken,
       };
     } else {
       localStorage.removeItem("accessToken");
@@ -149,7 +157,18 @@ const getInitialAuthState = (): AuthState => {
     loading: "idle",
     error: null,
     registrationStatus: "idle",
+    refreshToken: null,
   };
+};
+
+// Helper functions for localStorage
+const getStoredUser = (): User | null => {
+  const storedUser = localStorage.getItem("user");
+  return storedUser ? JSON.parse(storedUser) : null;
+};
+
+const getStoredRefreshToken = (): string | null => {
+  return localStorage.getItem("refreshToken");
 };
 
 const initialState: AuthState = getInitialAuthState();
@@ -162,6 +181,17 @@ const authSlice = createSlice({
       state.user!.email = action.payload.email;
       state.user!.username = action.payload.username;
       state.isAuthenticated = true;
+    },
+    setTokens: (state, action: PayloadAction<Tokens>) => {
+      if (state.user) {
+        state.user.access_token = action.payload.accessToken;
+        localStorage.setItem("user", JSON.stringify(state.user));
+      }
+      if (action.payload.refreshToken) {
+        state.refreshToken = action.payload.refreshToken;
+        if (state.user) state.user.refresh_token = action.payload.refreshToken; // keep user object consistent
+        localStorage.setItem("refreshToken", action.payload.refreshToken);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -176,6 +206,7 @@ const authSlice = createSlice({
         state.loading = "succeeded";
         state.isAuthenticated = true;
         state.user = action.payload;
+        state.refreshToken = action.payload.refresh_token;
         state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
@@ -206,6 +237,7 @@ const authSlice = createSlice({
         state.loading = "idle";
         state.error = null;
         state.registrationStatus = "idle";
+        state.refreshToken = null;
       })
       .addCase(logout.rejected, (state, action) => {
         state.user = null;
@@ -217,5 +249,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser } = authSlice.actions;
+export const { setUser, setTokens } = authSlice.actions;
 export default authSlice.reducer;

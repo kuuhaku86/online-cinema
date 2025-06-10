@@ -1,6 +1,7 @@
 import { User } from "../features/auth/authSlice";
+import apiClient from "./apiClient"; // Import the new apiClient
 
-const API_BASE_URL = import.meta.env.VITE_API_HOST + "/api/users";
+// const API_BASE_URL = import.meta.env.VITE_API_HOST + "/api/users"; // Base URL is now in apiClient
 
 export interface UpdateProfileCredentials {
   username?: string;
@@ -11,25 +12,11 @@ export interface UpdateProfileCredentials {
 
 export const updateProfile = async (
   credentials: UpdateProfileCredentials,
-  accessToken: string,
+  // accessToken: string, // No longer needed, apiClient handles it
   userId: string
 ): Promise<User> => {
-  const response = await fetch(API_BASE_URL + "/" + userId, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    const message = Array.isArray(errorData.message)
-      ? errorData.message.join(", ")
-      : errorData.message;
-    throw new Error(message || `HTTP error! status: ${response.status}`);
-  }
-
-  return await response.json();
+  // The apiClient will automatically add the Authorization header.
+  // The URL will be relative to the apiClient's baseURL.
+  const response = await apiClient.patch<User>(`/users/${userId}`, credentials);
+  return response.data;
 };

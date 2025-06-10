@@ -22,19 +22,17 @@ export const updateProfile = createAsyncThunk<
 >(
   "profile/updateProfile",
   async (credentials, { getState, rejectWithValue, dispatch }) => {
-    const state = getState();
-    const accessToken = state.auth.user?.access_token;
+    const { user } = getState().auth; // Get the whole user object
 
-    if (!accessToken) {
-      return rejectWithValue("No access token available.");
+    if (!user?.access_token) {
+      // Still good to check if user is authenticated
+      return rejectWithValue("User not authenticated.");
     }
 
     try {
-      const updatedUser = await userApi.updateProfile(
-        credentials,
-        accessToken,
-        state.auth.user!.id
-      );
+      // accessToken is no longer passed as an argument here,
+      // as usersApi.updateProfile will use the apiClient which handles it.
+      const updatedUser = await userApi.updateProfile(credentials, user.id);
       dispatch(setUser(updatedUser));
 
       return updatedUser;
