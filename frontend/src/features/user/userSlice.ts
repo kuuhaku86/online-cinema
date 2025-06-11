@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import * as userApi from "../../services/usersApi";
-import { RootState } from "../../store";
+import type { RootState } from "../../store";
 import { User, setUser } from "../auth/authSlice"; // Import User and the new setUser action
 
 interface ProfileState {
