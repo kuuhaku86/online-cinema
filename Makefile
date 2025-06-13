@@ -21,6 +21,10 @@ ps:
 build:
 	docker-compose -p $(PROJECT_NAME) build
 
+rebuild-backend:
+	docker-compose -p $(PROJECT_NAME) down -d backend
+	docker-compose -p $(PROJECT_NAME) up --build -d backend
+
 rebuild:
 	docker-compose -p $(PROJECT_NAME) down
 	docker-compose -p $(PROJECT_NAME) up --build -d
