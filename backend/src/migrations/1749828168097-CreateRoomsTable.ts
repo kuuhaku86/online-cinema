@@ -7,7 +7,6 @@ export class CreateRoomsTable1749828168097 implements MigrationInterface {
         await queryRunner.query(`
             CREATE TABLE "rooms" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "name" character varying(100) NOT NULL,
                 "short_code" character varying(6) NOT NULL DEFAULT SUBSTRING(REPLACE(uuid_generate_v4()::text, '-', ''), 1, 6),
                 "user_ids" jsonb NOT NULL DEFAULT '[]'::jsonb,
                 "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
