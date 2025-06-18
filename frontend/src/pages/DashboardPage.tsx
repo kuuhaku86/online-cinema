@@ -1,16 +1,54 @@
 import React, { useState } from "react";
+import { createRoomApi, RoomData } from "../services/roomApi";
 
 const DashboardPage: React.FC = () => {
   const [roomCode, setRoomCode] = useState("");
+  const [isCreatingRoom, setIsCreatingRoom] = useState(false);
+  const [createRoomError, setCreateRoomError] = useState<string | null>(null);
+
+  const handleJoinRoom = () => {
+    // TODO: Implement actual join room logic
+    if (!roomCode.trim()) {
+      alert("Please enter a room code.");
+      return;
+    }
+    console.log("Attempting to join room:", roomCode);
+    // Example navigation: history.push(`/room/${roomCode}`);
+  };
+
+  const handleCreateRoom = async () => {
+    setIsCreatingRoom(true);
+    setCreateRoomError(null);
+    try {
+      const newRoomData: RoomData = await createRoomApi(); // Use the imported API function
+
+      console.log("Room created successfully:", newRoomData);
+      // TODO: Handle successful room creation, e.g., navigate to the new room
+      // For example, if the API returns a room code or ID:
+      // if (newRoomData.roomCode) {
+      //   history.push(`/room/${newRoomData.roomCode}`);
+      // } else {
+      //   alert(`Room created! ID: ${newRoomData.id || 'N/A'}`);
+      // }
+    } catch (error) {
+      if (error instanceof Error) {
+        setCreateRoomError(error.message);
+      } else {
+        setCreateRoomError(
+          "An unknown error occurred while creating the room."
+        );
+      }
+      console.error("Error creating room:", error);
+    } finally {
+      setIsCreatingRoom(false);
+    }
+  };
 
   return (
-    // This div now takes full height from <main> and arranges title and panels-wrapper vertically
     <div className="h-[90vh] flex flex-col p-4">
       {" "}
       <h1 className="text-2xl font-bold mb-4 text-center">Dashboard</h1>
-      {/* This div takes remaining vertical space and centers the row of panels */}
       <div className="flex-grow grid grid-cols-12 gap-4">
-        {/* Join a Room Panel */}
         <div className="border-2 rounded-lg border-red-700 col-span-6 h-full p-4 flex flex-col justify-center items-center text-center">
           <h2 className="text-3xl font-bold mb-6">Join a Room</h2>
           <label
@@ -29,20 +67,26 @@ const DashboardPage: React.FC = () => {
           />
           <button
             className="mt-4 w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-            type="submit"
+            type="button"
+            onClick={handleJoinRoom}
+            disabled={!roomCode.trim()}
           >
             Join
           </button>
         </div>
-        {/* Start new Room Panel */}
         <div className="border-2 rounded-lg border-red-700 col-span-6 h-full p-4 flex flex-col justify-center items-center text-center">
           <h2 className="text-3xl font-bold mb-6">Start new Room</h2>
           <button
             className="mt-4 w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-            type="submit"
+            type="button"
+            onClick={handleCreateRoom}
+            disabled={isCreatingRoom}
           >
-            Create New Room
+            {isCreatingRoom ? "Creating..." : "Create New Room"}
           </button>
+          {createRoomError && (
+            <p className="mt-4 text-red-500">{createRoomError}</p>
+          )}
         </div>
       </div>
     </div>
