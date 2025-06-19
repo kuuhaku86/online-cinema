@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Room } from '../entities/room.entity';
@@ -22,5 +22,22 @@ export class RoomService {
     const savedRoom = await this.roomRepository.save(newRoom);
 
     return savedRoom;
+  }
+
+  async joinRoom(roomCode: string, userId: string): Promise<Room> {
+    const room = await this.roomRepository.findOne({
+      where: { short_code: roomCode },
+    });
+
+    if (!room) {
+      throw new NotFoundException(`Room with code "${roomCode}" not found.`);
+    }
+
+    if (!room.user_ids.includes(userId)) {
+      room.user_ids.push(userId);
+      return this.roomRepository.save(room);
+    }
+
+    return room;
   }
 }
