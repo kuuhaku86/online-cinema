@@ -1,27 +1,45 @@
 import React, { useState } from "react";
-import { createRoomApi, RoomData } from "../services/roomApi";
+// import { useNavigate } from "react-router"; // Import useNavigate
+import { createRoomApi, joinRoomApi, RoomData } from "../services/roomApi"; // Assume joinRoomApi is added to roomApi.ts
 
 const DashboardPage: React.FC = () => {
+  // const navigate = useNavigate(); // Initialize useNavigate
   const [roomCode, setRoomCode] = useState("");
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [createRoomError, setCreateRoomError] = useState<string | null>(null);
+  const [isJoiningRoom, setIsJoiningRoom] = useState(false);
+  const [joinRoomError, setJoinRoomError] = useState<string | null>(null);
 
-  const handleJoinRoom = () => {
-    // TODO: Implement actual join room logic
+  const handleJoinRoom = async () => {
     if (!roomCode.trim()) {
       alert("Please enter a room code.");
       return;
     }
-    console.log("Attempting to join room:", roomCode);
-    // Example navigation: history.push(`/room/${roomCode}`);
+    setIsJoiningRoom(true);
+    setJoinRoomError(null);
+    try {
+      // Assume joinRoomApi exists and makes the API call
+      // It should return room data or throw an error
+      const joinedRoomData: RoomData = await joinRoomApi(roomCode);
+      console.log("Successfully joined room:", joinedRoomData);
+      // navigate(`/room/${roomCode}`);
+    } catch (error) {
+      if (error instanceof Error) {
+        setJoinRoomError(error.message);
+      } else {
+        setJoinRoomError("An unknown error occurred while joining the room.");
+      }
+      console.error("Error joining room:", error);
+    } finally {
+      setIsJoiningRoom(false);
+    }
   };
 
   const handleCreateRoom = async () => {
     setIsCreatingRoom(true);
     setCreateRoomError(null);
     try {
-      const newRoomData: RoomData = await createRoomApi(); // Use the imported API function
-
+      const newRoomData: RoomData = await createRoomApi();
       console.log("Room created successfully:", newRoomData);
       // TODO: Handle successful room creation, e.g., navigate to the new room
       // For example, if the API returns a room code or ID:
@@ -69,10 +87,13 @@ const DashboardPage: React.FC = () => {
             className="mt-4 w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
             type="button"
             onClick={handleJoinRoom}
-            disabled={!roomCode.trim()}
+            disabled={!roomCode.trim() || isJoiningRoom}
           >
-            Join
+            {isJoiningRoom ? "Joining..." : "Join"}
           </button>
+          {joinRoomError && (
+            <p className="mt-4 text-red-500">{joinRoomError}</p>
+          )}
         </div>
         <div className="border-2 rounded-lg border-red-700 col-span-6 h-full p-4 flex flex-col justify-center items-center text-center">
           <h2 className="text-3xl font-bold mb-6">Start new Room</h2>
