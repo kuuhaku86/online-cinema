@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import MainLayout from "./layouts/MainLayout";
 import ProfilePage from "./pages/ProfilePage";
+import VideoSelectionPage from "./pages/VideoSelectionPage";
 
 function App() {
   return (
@@ -12,7 +13,10 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
-
+          <Route
+            path="/video-selection/:shortCode"
+            element={<VideoSelectionPage />}
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

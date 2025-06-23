@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-// import { useNavigate } from "react-router"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { createRoomApi, joinRoomApi, RoomData } from "../services/roomApi"; // Assume joinRoomApi is added to roomApi.ts
 
 const DashboardPage: React.FC = () => {
-  // const navigate = useNavigate(); // Initialize useNavigate
-  const [roomCode, setRoomCode] = useState("");
+  const [shortCode, setShortCode] = useState("");
+  const navigate = useNavigate(); // Initialize useNavigate
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [createRoomError, setCreateRoomError] = useState<string | null>(null);
   const [isJoiningRoom, setIsJoiningRoom] = useState(false);
   const [joinRoomError, setJoinRoomError] = useState<string | null>(null);
 
   const handleJoinRoom = async () => {
-    if (!roomCode.trim()) {
+    if (!shortCode.trim()) {
       alert("Please enter a room code.");
       return;
     }
@@ -20,9 +20,8 @@ const DashboardPage: React.FC = () => {
     try {
       // Assume joinRoomApi exists and makes the API call
       // It should return room data or throw an error
-      const joinedRoomData: RoomData = await joinRoomApi(roomCode);
+      const joinedRoomData: RoomData = await joinRoomApi(shortCode);
       console.log("Successfully joined room:", joinedRoomData);
-      // navigate(`/room/${roomCode}`);
     } catch (error) {
       if (error instanceof Error) {
         setJoinRoomError(error.message);
@@ -40,14 +39,14 @@ const DashboardPage: React.FC = () => {
     setCreateRoomError(null);
     try {
       const newRoomData: RoomData = await createRoomApi();
-      console.log("Room created successfully:", newRoomData);
-      // TODO: Handle successful room creation, e.g., navigate to the new room
-      // For example, if the API returns a room code or ID:
-      // if (newRoomData.roomCode) {
-      //   history.push(`/room/${newRoomData.roomCode}`);
-      // } else {
-      //   alert(`Room created! ID: ${newRoomData.id || 'N/A'}`);
-      // }
+      console.log(
+        "Room created successfully:",
+        newRoomData,
+        newRoomData.shortCode
+      );
+      if (newRoomData.shortCode) {
+        navigate(`/video-selection/${newRoomData.shortCode}`);
+      }
     } catch (error) {
       if (error instanceof Error) {
         setCreateRoomError(error.message);
@@ -70,24 +69,24 @@ const DashboardPage: React.FC = () => {
         <div className="border-2 rounded-lg border-red-700 col-span-6 h-full p-4 flex flex-col justify-center items-center text-center">
           <h2 className="text-3xl font-bold mb-6">Join a Room</h2>
           <label
-            htmlFor="room-code"
+            htmlFor="short-code"
             className="block mb-2 text-lg font-medium text-gray-900 dark:text-white"
           >
-            Room Code
+            Room Code (Short Code)
           </label>
           <input
             type="text"
-            id="room-code"
+            id="short-code"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 w-1/2 mb-4 p-2.5 text-center dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            value={roomCode}
-            onChange={(e) => setRoomCode(e.target.value)}
+            value={shortCode}
+            onChange={(e) => setShortCode(e.target.value)}
             required
           />
           <button
             className="mt-4 w-1/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
             type="button"
             onClick={handleJoinRoom}
-            disabled={!roomCode.trim() || isJoiningRoom}
+            disabled={!shortCode.trim() || isJoiningRoom}
           >
             {isJoiningRoom ? "Joining..." : "Join"}
           </button>
