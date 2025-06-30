@@ -7,9 +7,10 @@ import { DatabaseModule } from './database.module';
 import { UsersModule } from './users.module';
 import { AuthModule } from './auth.module';
 import { RoomModule } from './room.module';
+import { VideosModule } from './videos.module';
 
 @Module({
-  imports: [DatabaseModule, UsersModule, AuthModule, RoomModule],
+  imports: [DatabaseModule, UsersModule, AuthModule, RoomModule, VideosModule],
   controllers: [AppController, TestController],
   providers: [AppService, TestService],
 })
