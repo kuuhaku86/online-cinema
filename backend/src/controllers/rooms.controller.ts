@@ -8,7 +8,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RoomService } from '../services/room.service';
+import { RoomsService } from '../services/rooms.service';
 import { Room } from '../entities/room.entity';
 import { User } from '../entities/user.entity';
 import { Request } from 'express';
@@ -18,17 +18,15 @@ interface RequestWithAuthenticatedUser extends Request {
 }
 
 @Controller('rooms')
-export class RoomController {
-  constructor(private readonly roomService: RoomService) {}
+export class RoomsController {
+  constructor(private readonly RoomsService: RoomsService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<Room> {
+  async create(@Req() req: RequestWithAuthenticatedUser): Promise<Room> {
     const currentUser = req.user;
-    return this.roomService.createRoom(currentUser.id);
+    return this.RoomsService.createRoom(currentUser.id);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -39,6 +37,6 @@ export class RoomController {
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<Room> {
     const userId = req.user.id;
-    return this.roomService.joinRoom(roomCode, userId);
+    return this.RoomsService.joinRoom(roomCode, userId);
   }
 }

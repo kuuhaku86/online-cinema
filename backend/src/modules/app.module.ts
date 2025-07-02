@@ -6,11 +6,11 @@ import { TestService } from '../services/test.service';
 import { DatabaseModule } from './database.module';
 import { UsersModule } from './users.module';
 import { AuthModule } from './auth.module';
-import { RoomModule } from './room.module';
+import { RoomsModule } from './rooms.module';
 import { VideosModule } from './videos.module';
 
 @Module({
-  imports: [DatabaseModule, UsersModule, AuthModule, RoomModule, VideosModule],
+  imports: [DatabaseModule, UsersModule, AuthModule, RoomsModule, VideosModule],
   controllers: [AppController, TestController],
   providers: [AppService, TestService],
 })

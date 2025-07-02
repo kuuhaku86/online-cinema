@@ -5,7 +5,7 @@ import { Room } from '../entities/room.entity';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
-export class RoomService {
+export class RoomsService {
   constructor(
     @InjectRepository(Room)
     private readonly roomRepository: Repository<Room>,
