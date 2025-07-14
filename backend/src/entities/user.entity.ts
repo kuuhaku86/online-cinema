@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Video } from './video.entity';
 
 @Entity('users')
 export class User {
@@ -34,4 +36,7 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Video, (video) => video.user)
+  videos: Video[];
 }
