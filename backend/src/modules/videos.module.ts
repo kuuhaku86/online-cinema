@@ -2,14 +2,15 @@ import { Module } from '@nestjs/common';
 import { VideosController } from '../controllers/videos.controller';
 import { VideosService } from '../services/videos.service';
 import { AuthModule } from './auth.module';
-import { RoomsModule } from './rooms.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { Video } from 'src/entities/video.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
     AuthModule,
-    RoomsModule,
+    TypeOrmModule.forFeature([Video]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads',
