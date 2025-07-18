@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { createRoomApi, joinRoomApi, RoomData } from "../services/roomApi"; // Assume joinRoomApi is added to roomApi.ts
+import { createRoomApi, joinRoomApi, RoomData } from "../services/roomsApi"; // Assume joinRoomApi is added to roomApi.ts
 
 const DashboardPage: React.FC = () => {
   const [shortCode, setShortCode] = useState("");

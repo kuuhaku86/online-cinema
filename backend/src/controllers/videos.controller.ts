@@ -24,7 +24,7 @@ export class VideosController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('upload')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(FileInterceptor('file'))
   async upload(
     @UploadedFile() file: Express.Multer.File,
