@@ -15,14 +15,13 @@ interface ApiErrorResponse {
 }
 
 export const uploadVideoApi = async (file: File): Promise<VideoData> => {
-  const formData = {
-    file,
-  };
-  const response = await apiClient.postForm(`/videos/upload`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const formData = new FormData();
+  // The key "file" must match the field name the backend is expecting (e.g., from multer).
+  formData.append("file", file);
+
+  // When passing a FormData object to axios, it automatically sets the
+  // correct 'Content-Type' header with the boundary. Do not set it manually.
+  const response = await apiClient.post(`/videos/upload`, formData);
 
   if (response.status !== 201) {
     // Axios automatically parses JSON responses, so response.data is already the object.

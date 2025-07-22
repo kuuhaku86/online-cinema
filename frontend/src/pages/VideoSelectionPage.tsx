@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom"; // Import useParams
+import { useParams } from "react-router-dom";
+import { uploadVideoApi } from "../services/videosApi";
 
 const VideoSelectionPage: React.FC = () => {
-  const { shortCode } = useParams<{ shortCode: string }>(); // Get shortCode from URL params
+  const { shortCode } = useParams<{ shortCode: string }>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -28,13 +29,11 @@ const VideoSelectionPage: React.FC = () => {
     setUploadError(null);
     setUploadSuccess(null);
 
-    // Placeholder for actual upload logic
     console.log("Uploading file:", selectedFile.name);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await uploadVideoApi(selectedFile);
       setUploadSuccess(`Successfully uploaded ${selectedFile.name}!`);
-      setSelectedFile(null); // Clear selected file after successful upload
+      setSelectedFile(null);
     } catch (error) {
       setUploadError("Failed to upload video. Please try again.");
       console.error("Upload error:", error);
