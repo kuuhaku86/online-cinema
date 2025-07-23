@@ -10,6 +10,12 @@ export class VideosService {
     private readonly videoRepository: Repository<Video>,
   ) {}
 
+  async getVideos(userId: string): Promise<Video[]> {
+    return this.videoRepository.find({
+      where: { userId },
+    });
+  }
+
   async handleUpload(file: Express.Multer.File, userId: string) {
     console.log(`Video uploaded by user ${userId}: ${file.path}`);
 

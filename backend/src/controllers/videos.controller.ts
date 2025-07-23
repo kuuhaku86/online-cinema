@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Get,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { VideosService } from '../services/videos.service';
@@ -21,6 +22,14 @@ interface RequestWithAuthenticatedUser extends Request {
 @Controller('videos')
 export class VideosController {
   constructor(private readonly videosService: VideosService) {}
+
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
+  @Get()
+  async getVideos(@Req() req: RequestWithAuthenticatedUser) {
+    const currentUser = req.user;
+    return this.videosService.getVideos(currentUser.id);
+  }
 
   @UseGuards(AuthGuard('jwt'))
   @Post('upload')
