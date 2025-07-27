@@ -2,11 +2,13 @@ import apiClient from "./apiClient";
 
 export interface VideoData {
   id: string;
+  fileName: string | null;
 }
 
 interface RawVideoApiResponse {
   videoId: string;
-  message: string;
+  fileName: string | null;
+  message: string | null;
 }
 
 interface ApiErrorResponse {
@@ -16,15 +18,11 @@ interface ApiErrorResponse {
 
 export const uploadVideoApi = async (file: File): Promise<VideoData> => {
   const formData = new FormData();
-  // The key "file" must match the field name the backend is expecting (e.g., from multer).
   formData.append("file", file);
 
-  // When passing a FormData object to axios, it automatically sets the
-  // correct 'Content-Type' header with the boundary. Do not set it manually.
   const response = await apiClient.post(`/videos/upload`, formData);
 
   if (response.status !== 201) {
-    // Axios automatically parses JSON responses, so response.data is already the object.
     const errorData: ApiErrorResponse = response.data;
     const errorMessage =
       errorData.message ||
@@ -36,8 +34,30 @@ export const uploadVideoApi = async (file: File): Promise<VideoData> => {
   }
 
   const rawData: RawVideoApiResponse = response.data;
-  const newRoomData: VideoData = {
+  const newVideoData: VideoData = {
     id: rawData.videoId,
+    fileName: null,
   };
-  return newRoomData;
+  return newVideoData;
+};
+
+export const getVideosApi = async (): Promise<VideoData[]> => {
+  const response = await apiClient.get(`/videos`);
+  if (response.status !== 200) {
+    const errorData: ApiErrorResponse = response.data;
+    const errorMessage =
+      errorData.message ||
+      errorData.error ||
+      `Failed to get videos. Status: ${response.status} - ${
+        response.statusText || "Unknown error"
+      }`;
+    throw new Error(errorMessage);
+  }
+
+  const rawData: RawVideoApiResponse[] = response.data;
+
+  return rawData.map((video) => ({
+    id: video.videoId,
+    fileName: video.fileName,
+  }));
 };
