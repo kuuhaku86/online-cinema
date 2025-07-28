@@ -1,17 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { uploadVideoApi, getVideosApi } from "../services/videosApi";
+import { uploadVideoApi, getVideosApi, VideoData } from "../services/videosApi";
 
 const VideoSelectionPage: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [selectedVideoTitle, setSelectedVideoTitle] = useState<string | null>(
-    null
-  );
+  const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const [videos, setVideos] = useState<VideoData[]>([]);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const tempVideos = await getVideosApi();
+        setVideos(tempVideos);
+      } catch (err) {
+        console.error("Error on fetching videos", err);
+      }
+    };
+
+    fetchVideos();
+  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -96,7 +108,7 @@ const VideoSelectionPage: React.FC = () => {
                 getVideosApi();
               }}
             >
-              {selectedVideoTitle || "Select Video"}
+              {selectedVideo?.fileName || "Select Video"}
               <svg
                 className="w-2.5 h-2.5 ms-3"
                 aria-hidden="true"
@@ -123,23 +135,20 @@ const VideoSelectionPage: React.FC = () => {
                 className="h-48 py-2 overflow-y-auto text-gray-700 dark:text-gray-200"
                 aria-labelledby="dropdownUsersButton"
               >
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
-                    Jese Leos
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
-                    <img src="" alt="" />
-                    Robert Gough
-                  </a>
-                </li>
+                {videos.map((video) => (
+                  <li>
+                    <a
+                      href="#"
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={() => {
+                        setSelectedVideo(video);
+                        setDropdownVisible(false);
+                      }}
+                    >
+                      {video.fileName}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
