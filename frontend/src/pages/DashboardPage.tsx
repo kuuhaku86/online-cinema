@@ -1,44 +1,37 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { createRoomApi, joinRoomApi, RoomData } from "../services/roomsApi"; // Assume joinRoomApi is added to roomApi.ts
+import { useNavigate } from "react-router-dom";
+import { useRooms } from "../hooks/useRooms";
 
 const DashboardPage: React.FC = () => {
   const [shortCode, setShortCode] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate
-  const [isCreatingRoom, setIsCreatingRoom] = useState(false);
-  const [createRoomError, setCreateRoomError] = useState<string | null>(null);
-  const [isJoiningRoom, setIsJoiningRoom] = useState(false);
-  const [joinRoomError, setJoinRoomError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const {
+    createRoom,
+    isCreatingRoom,
+    createRoomError,
+    joinRoom,
+    isJoiningRoom,
+    joinRoomError,
+  } = useRooms();
 
   const handleJoinRoom = async () => {
     if (!shortCode.trim()) {
       alert("Please enter a room code.");
       return;
     }
-    setIsJoiningRoom(true);
-    setJoinRoomError(null);
     try {
-      // Assume joinRoomApi exists and makes the API call
-      // It should return room data or throw an error
-      const joinedRoomData: RoomData = await joinRoomApi(shortCode);
+      const joinedRoomData = await joinRoom(shortCode);
       console.log("Successfully joined room:", joinedRoomData);
+      // TODO: Navigate to the joined room, e.g., navigate(`/room/${joinedRoomData.shortCode}`);
     } catch (error) {
-      if (error instanceof Error) {
-        setJoinRoomError(error.message);
-      } else {
-        setJoinRoomError("An unknown error occurred while joining the room.");
-      }
-      console.error("Error joining room:", error);
-    } finally {
-      setIsJoiningRoom(false);
+      // Error is handled and logged by the hook
+      console.log("Error joining room:", error);
     }
   };
 
   const handleCreateRoom = async () => {
-    setIsCreatingRoom(true);
-    setCreateRoomError(null);
     try {
-      const newRoomData: RoomData = await createRoomApi();
+      const newRoomData = await createRoom();
       console.log(
         "Room created successfully:",
         newRoomData,
@@ -48,16 +41,8 @@ const DashboardPage: React.FC = () => {
         navigate(`/video-selection/${newRoomData.shortCode}`);
       }
     } catch (error) {
-      if (error instanceof Error) {
-        setCreateRoomError(error.message);
-      } else {
-        setCreateRoomError(
-          "An unknown error occurred while creating the room."
-        );
-      }
-      console.error("Error creating room:", error);
-    } finally {
-      setIsCreatingRoom(false);
+      // Error is handled and logged by the hook
+      console.log("Error creating room:", error);
     }
   };
 

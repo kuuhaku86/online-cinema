@@ -1,60 +1,41 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { uploadVideoApi, getVideosApi, VideoData } from "../services/videosApi";
+import { VideoData } from "../services/videosApi";
+import { useVideos } from "../hooks/useVideos";
 
 const VideoSelectionPage: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
-  const [videos, setVideos] = useState<VideoData[]>([]);
 
-  useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        const tempVideos = await getVideosApi();
-        setVideos(tempVideos);
-      } catch (err) {
-        console.error("Error on fetching videos", err);
-      }
-    };
-
-    fetchVideos();
-  }, []);
+  const {
+    videos,
+    loading,
+    error: fetchError,
+    uploadVideo,
+    uploading,
+    uploadError,
+    uploadSuccess,
+    clearUploadStatus,
+  } = useVideos();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(event.target.files[0]);
-      setUploadError(null);
-      setUploadSuccess(null);
+      clearUploadStatus();
     } else {
       setSelectedFile(null);
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) {
-      setUploadError("Please select a file to upload.");
-      return;
-    }
-
-    setUploading(true);
-    setUploadError(null);
-    setUploadSuccess(null);
-
-    console.log("Uploading file:", selectedFile.name);
+    if (!selectedFile) return;
     try {
-      await uploadVideoApi(selectedFile);
-      setUploadSuccess(`Successfully uploaded ${selectedFile.name}!`);
+      await uploadVideo(selectedFile);
       setSelectedFile(null);
     } catch (error) {
-      setUploadError("Failed to upload video. Please try again.");
-      console.error("Upload error:", error);
-    } finally {
-      setUploading(false);
+      console.log("Error uploading video:", error);
     }
   };
 
@@ -87,7 +68,7 @@ const VideoSelectionPage: React.FC = () => {
           </button>
           {uploadError && <p className="mt-2 text-red-500">{uploadError}</p>}
           {uploadSuccess && (
-            <p className="mt-2 text-green-500">{uploadSuccess}</p>
+            <p className="mt-2 text-green-500">Video uploaded successfully!</p>
           )}
         </div>
         <div className="border-2 rounded-lg border-red-700 col-span-6 h-full p-4 flex flex-col justify-center items-center text-center">
@@ -103,10 +84,7 @@ const VideoSelectionPage: React.FC = () => {
               data-dropdown-placement="bottom"
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               type="button"
-              onClick={() => {
-                setDropdownVisible((prev) => !prev);
-                getVideosApi();
-              }}
+              onClick={() => setDropdownVisible((prev) => !prev)}
             >
               {selectedVideo?.fileName || "Select Video"}
               <svg
@@ -135,20 +113,26 @@ const VideoSelectionPage: React.FC = () => {
                 className="h-48 py-2 overflow-y-auto text-gray-700 dark:text-gray-200"
                 aria-labelledby="dropdownUsersButton"
               >
-                {videos.map((video) => (
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      onClick={() => {
-                        setSelectedVideo(video);
-                        setDropdownVisible(false);
-                      }}
-                    >
-                      {video.fileName}
-                    </a>
-                  </li>
-                ))}
+                {loading && <li className="px-4 py-2">Loading...</li>}
+                {fetchError && (
+                  <li className="px-4 py-2 text-red-500">{fetchError}</li>
+                )}
+                {!loading &&
+                  !fetchError &&
+                  videos.map((video) => (
+                    <li key={video.id}>
+                      <a
+                        href="#"
+                        className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                        onClick={() => {
+                          setSelectedVideo(video);
+                          setDropdownVisible(false);
+                        }}
+                      >
+                        {video.fileName}
+                      </a>
+                    </li>
+                  ))}
               </ul>
             </div>
           </div>
