@@ -6,6 +6,7 @@ import MainLayout from "./layouts/MainLayout";
 import ProfilePage from "./pages/ProfilePage";
 import VideoSelectionPage from "./pages/VideoSelectionPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoomPage from "./pages/RoomPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
               path="/video-selection/:shortCode"
               element={<VideoSelectionPage />}
             />
+            <Route path="/room/:shortCode" element={<RoomPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Route>

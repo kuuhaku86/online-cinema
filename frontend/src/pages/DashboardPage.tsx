@@ -22,9 +22,8 @@ const DashboardPage: React.FC = () => {
     try {
       const joinedRoomData = await joinRoom(shortCode);
       console.log("Successfully joined room:", joinedRoomData);
-      // TODO: Navigate to the joined room, e.g., navigate(`/room/${joinedRoomData.shortCode}`);
+      navigate(`/room/${joinedRoomData.shortCode}`);
     } catch (error) {
-      // Error is handled and logged by the hook
       console.log("Error joining room:", error);
     }
   };
@@ -41,7 +40,6 @@ const DashboardPage: React.FC = () => {
         navigate(`/video-selection/${newRoomData.shortCode}`);
       }
     } catch (error) {
-      // Error is handled and logged by the hook
       console.log("Error creating room:", error);
     }
   };

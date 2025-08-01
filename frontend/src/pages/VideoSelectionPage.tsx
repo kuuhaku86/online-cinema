@@ -70,6 +70,12 @@ const VideoSelectionPage: React.FC = () => {
           {uploadSuccess && (
             <p className="mt-2 text-green-500">Video uploaded successfully!</p>
           )}
+          <button
+            className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50"
+            disabled={!uploadSuccess}
+          >
+            Start Room
+          </button>
         </div>
         <div className="border-2 rounded-lg border-red-700 col-span-6 h-full p-4 flex flex-col justify-center items-center text-center">
           <h2 className="text-3xl font-bold mb-6">Select Existing Video</h2>
@@ -135,6 +141,13 @@ const VideoSelectionPage: React.FC = () => {
                   ))}
               </ul>
             </div>
+            <div></div>
+            <button
+              className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50"
+              disabled={!selectedVideo}
+            >
+              Start Room
+            </button>
           </div>
         </div>
       </div>
