@@ -8,9 +8,27 @@ import { UsersModule } from './users.module';
 import { AuthModule } from './auth.module';
 import { RoomsModule } from './rooms.module';
 import { VideosModule } from './videos.module';
+import { RedisModule } from 'nestjs-redis';
 
 @Module({
-  imports: [DatabaseModule, UsersModule, AuthModule, RoomsModule, VideosModule],
+  imports: [
+    DatabaseModule,
+    UsersModule,
+    AuthModule,
+    RoomsModule,
+    VideosModule,
+    RedisModule.forRootAsync({
+      useFactory: () => {
+        const redisUrl = process.env.REDIS_URL;
+        if (!redisUrl) {
+          throw new Error('REDIS_URL environment variable is not set.');
+        }
+        return {
+          url: redisUrl,
+        };
+      },
+    }),
+  ],
   controllers: [AppController, TestController],
   providers: [AppService, TestService],
 })

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   backend:
@@ -17,8 +17,10 @@ services:
       - JWT_EXPIRATION=3600s
       - JWT_REFRESH_SECRET=test2
       - JWT_REFRESH_EXPIRATION=3600s
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - db
+      - redis
     networks:
       - online-cinema-net
     volumes:
@@ -57,9 +59,20 @@ services:
     networks:
       - online-cinema-net
 
+  redis:
+    image: redis:latest
+    container_name: online-cinema-redis
+    command: ["redis-server", "--appendonly", "yes"] # Enable data persistence
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data # Persist data
+    networks:
+      - online-cinema-net
+
 volumes:
   postgres_data:
-
+  redis_data:
 
 networks:
   online-cinema-net:
