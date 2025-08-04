@@ -64,7 +64,7 @@ services:
     container_name: online-cinema-redis
     command: ["redis-server", "--appendonly", "yes"] # Enable data persistence
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data # Persist data
     networks:

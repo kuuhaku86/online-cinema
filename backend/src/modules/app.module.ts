@@ -8,7 +8,7 @@ import { UsersModule } from './users.module';
 import { AuthModule } from './auth.module';
 import { RoomsModule } from './rooms.module';
 import { VideosModule } from './videos.module';
-import { RedisModule } from 'nestjs-redis';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 @Module({
   imports: [
@@ -24,7 +24,9 @@ import { RedisModule } from 'nestjs-redis';
           throw new Error('REDIS_URL environment variable is not set.');
         }
         return {
-          url: redisUrl,
+          config: {
+            url: redisUrl,
+          },
         };
       },
     }),
