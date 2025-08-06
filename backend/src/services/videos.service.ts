@@ -64,6 +64,8 @@ export class VideosService {
 
     const savedVideo = await this.videoRepository.save(newVideo);
 
+    this.startVideoProcessing(file, savedVideo.id);
+
     return {
       message: 'Video uploaded successfully',
       videoId: savedVideo.id,
@@ -75,54 +77,73 @@ export class VideosService {
     await fs.mkdir(this.outputDir, { recursive: true });
   }
 
-  async startVideoProcessing(file: Express.Multer.File): Promise<string> {
-    const videoId = uuidv4();
+  private async startVideoProcessing(
+    file: Express.Multer.File,
+    videoId: string,
+  ) {
     const inputPath = file.path;
-    const outputFileName = `${file.filename.split('.')[0]}.mp4`;
-    const outputPath = join(this.outputDir, outputFileName);
+    // Create a dedicated directory for this video's HLS files
+    const hlsOutputDir = join(this.outputDir, videoId);
+    await fs.mkdir(hlsOutputDir, { recursive: true });
 
+    const manifestPath = join(hlsOutputDir, 'master.m3u8');
+
+    console.log('Set Processing Status');
     this.processingStatus.set(videoId, {
       status: 'pending',
       originalFileName: file.originalname,
     });
+    console.log('Finish Set Processing Status');
 
     ffmpeg(inputPath)
-      .output(outputPath)
-      .videoCodec('libx264')
-      .audioCodec('aac')
+      .outputOptions([
+        '-c:v libx264', // Video codec
+        '-c:a aac', // Audio codec
+        '-hls_time 10', // Segment duration in seconds
+        '-hls_list_size 0', // Keep all segments in the playlist (for VOD)
+        '-f hls', // HLS format
+      ])
+      .output(manifestPath)
       .on('start', () => {
         this.processingStatus.set(videoId, {
           ...this.processingStatus.get(videoId),
           status: 'processing',
         });
-        console.log(`FFmpeg process started for ${videoId}`);
+        console.log(`FFmpeg HLS process started for ${videoId}`);
       })
       .on('end', async () => {
         await fs.unlink(inputPath);
         this.processingStatus.set(videoId, {
           ...this.processingStatus.get(videoId),
           status: 'completed',
-          processedPath: outputPath,
+          processedPath: manifestPath,
         });
-        console.log(`FFmpeg processing finished for ${videoId}`);
+        console.log(`FFmpeg HLS processing finished for ${videoId}`);
       })
       .on('error', async (err) => {
         await fs.unlink(inputPath);
+        // Clean up the HLS directory on error
+        await fs.rm(hlsOutputDir, { recursive: true, force: true });
         this.processingStatus.set(videoId, {
           ...this.processingStatus.get(videoId),
           status: 'failed',
           error: err.message,
         });
-        console.error(`An error occurred for ${videoId}:`, err.message);
+        console.error(
+          `An error occurred during HLS conversion for ${videoId}:`,
+          err.message,
+        );
       })
       .run();
-
-    return videoId;
   }
 
-  getVideoStatus(videoId: string, userId: string): VideoStatus | undefined {
-    const video = this.videoRepository.find({
-      where: { id: videoId, userId },
+  async getVideoStatus(
+    videoId: string,
+    userId: string,
+  ): Promise<VideoStatus | undefined> {
+    const video = await this.videoRepository.findOneBy({
+      id: videoId,
+      userId,
     });
 
     if (!video) {

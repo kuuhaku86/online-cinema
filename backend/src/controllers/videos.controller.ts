@@ -51,12 +51,15 @@ export class VideosController {
   @UseGuards(AuthGuard('jwt'))
   @Get('status/:videoId')
   @HttpCode(HttpStatus.OK)
-  getVideoStatus(
+  async getVideoStatus(
     @Param('videoId') videoId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ) {
     const currentUser = req.user;
-    const status = this.videosService.getVideoStatus(videoId, currentUser.id);
+    const status = await this.videosService.getVideoStatus(
+      videoId,
+      currentUser.id,
+    );
     if (!status) {
       throw new NotFoundException('Video ID not found.');
     }
