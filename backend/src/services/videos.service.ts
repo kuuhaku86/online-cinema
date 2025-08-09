@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { Video } from 'src/entities/video.entity';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
 import * as ffmpeg from 'fluent-ffmpeg';
-import { Redis } from 'ioredis';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 type VideoStatus = {
   status: 'pending' | 'processing' | 'completed' | 'failed';
@@ -23,7 +23,7 @@ export class VideosService {
   constructor(
     @InjectRepository(Video)
     private readonly videoRepository: Repository<Video>,
-    @Inject('default') private readonly redisClient: Redis,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     this.createDirectories();
   }
@@ -90,7 +90,7 @@ export class VideosService {
     const manifestPath = join(hlsOutputDir, 'master.m3u8');
 
     console.log('Set Processing Status');
-    await this.redisClient.set(
+    await this.cacheManager.set(
       videoId,
       JSON.stringify({
         status: 'pending',
@@ -109,7 +109,7 @@ export class VideosService {
       ])
       .output(manifestPath)
       .on('start', async () => {
-        await this.redisClient.set(
+        await this.cacheManager.set(
           videoId,
           JSON.stringify({
             ...(await this.getVideoStatusFromRedis(videoId)),
@@ -120,8 +120,7 @@ export class VideosService {
       })
       .on('end', async () => {
         await fs.unlink(inputPath);
-
-        await this.redisClient.set(
+        await this.cacheManager.set(
           videoId,
           JSON.stringify({
             ...(await this.getVideoStatusFromRedis(videoId)),
@@ -135,8 +134,7 @@ export class VideosService {
         await fs.unlink(inputPath);
         // Clean up the HLS directory on error
         await fs.rm(hlsOutputDir, { recursive: true, force: true });
-
-        await this.redisClient.set(
+        await this.cacheManager.set(
           videoId,
           JSON.stringify({
             ...(await this.getVideoStatusFromRedis(videoId)),
@@ -152,10 +150,10 @@ export class VideosService {
       .run();
   }
 
-  async getVideoStatusFromRedis(
+  private async getVideoStatusFromRedis(
     videoId: string,
   ): Promise<VideoStatus | undefined> {
-    const statusJson = await this.redisClient.get(videoId);
+    const statusJson = await this.cacheManager.get<string>(videoId);
 
     if (!statusJson) {
       return undefined;

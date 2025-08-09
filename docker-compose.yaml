@@ -17,7 +17,8 @@ services:
       - JWT_EXPIRATION=3600s
       - JWT_REFRESH_SECRET=test2
       - JWT_REFRESH_EXPIRATION=3600s
-      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       - db
       - redis

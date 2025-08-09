@@ -8,7 +8,8 @@ import { UsersModule } from './users.module';
 import { AuthModule } from './auth.module';
 import { RoomsModule } from './rooms.module';
 import { VideosModule } from './videos.module';
-import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { CacheModule } from '@nestjs/cache-manager';
+import { RedisOptions } from 'src/configs/redis-options.constants';
 
 @Module({
   imports: [
@@ -17,19 +18,8 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
     AuthModule,
     RoomsModule,
     VideosModule,
-    RedisModule.forRootAsync({
-      useFactory: () => {
-        const redisUrl = process.env.REDIS_URL;
-        if (!redisUrl) {
-          throw new Error('REDIS_URL environment variable is not set.');
-        }
-        return {
-          config: {
-            url: redisUrl,
-          },
-        };
-      },
-    }),
+    CacheModule.register({ isGlobal: true }),
+    CacheModule.registerAsync(RedisOptions),
   ],
   controllers: [AppController, TestController],
   providers: [AppService, TestService],
