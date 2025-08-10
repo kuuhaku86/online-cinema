@@ -10,6 +10,7 @@ import { RoomsModule } from './rooms.module';
 import { VideosModule } from './videos.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from 'src/configs/redis-options.constants';
+import { HelpersModule } from './helpers.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RedisOptions } from 'src/configs/redis-options.constants';
     AuthModule,
     RoomsModule,
     VideosModule,
+    HelpersModule,
     CacheModule.register({ isGlobal: true }),
     CacheModule.registerAsync(RedisOptions),
   ],

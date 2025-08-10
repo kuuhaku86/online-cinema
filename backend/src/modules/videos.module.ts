@@ -6,10 +6,12 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { Video } from 'src/entities/video.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HelpersModule } from './helpers.module';
 
 @Module({
   imports: [
     AuthModule,
+    HelpersModule,
     TypeOrmModule.forFeature([Video]),
     MulterModule.register({
       storage: diskStorage({

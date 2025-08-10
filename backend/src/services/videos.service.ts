@@ -1,12 +1,16 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Video } from 'src/entities/video.entity';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import * as ffmpeg from 'fluent-ffmpeg';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { RedisHelper } from 'src/helpers/redis.helper';
 
 type VideoStatus = {
   status: 'pending' | 'processing' | 'completed' | 'failed';
@@ -23,7 +27,7 @@ export class VideosService {
   constructor(
     @InjectRepository(Video)
     private readonly videoRepository: Repository<Video>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(forwardRef(() => RedisHelper)) readonly redisHelper: RedisHelper,
   ) {
     this.createDirectories();
   }
@@ -90,13 +94,10 @@ export class VideosService {
     const manifestPath = join(hlsOutputDir, 'master.m3u8');
 
     console.log('Set Processing Status');
-    await this.cacheManager.set(
-      videoId,
-      JSON.stringify({
-        status: 'pending',
-        originalFileName: file.originalname,
-      }),
-    );
+    await this.redisHelper.set(videoId, {
+      status: 'pending',
+      originalFileName: file.originalname,
+    });
     console.log('Finish Set Processing Status');
 
     ffmpeg(inputPath)
@@ -109,63 +110,36 @@ export class VideosService {
       ])
       .output(manifestPath)
       .on('start', async () => {
-        await this.cacheManager.set(
-          videoId,
-          JSON.stringify({
-            ...(await this.getVideoStatusFromRedis(videoId)),
-            status: 'processing',
-          }),
-        );
+        await this.redisHelper.set(videoId, {
+          ...(await this.redisHelper.get<VideoStatus | undefined>(videoId)),
+          status: 'processing',
+        });
         console.log(`FFmpeg HLS process started for ${videoId}`);
       })
       .on('end', async () => {
         await fs.unlink(inputPath);
-        await this.cacheManager.set(
-          videoId,
-          JSON.stringify({
-            ...(await this.getVideoStatusFromRedis(videoId)),
-            status: 'completed',
-            processedPath: manifestPath,
-          }),
-        );
+        await this.redisHelper.set(videoId, {
+          ...(await this.redisHelper.get<VideoStatus | undefined>(videoId)),
+          status: 'completed',
+          processedPath: manifestPath,
+        });
         console.log(`FFmpeg HLS processing finished for ${videoId}`);
       })
       .on('error', async (err) => {
         await fs.unlink(inputPath);
         // Clean up the HLS directory on error
         await fs.rm(hlsOutputDir, { recursive: true, force: true });
-        await this.cacheManager.set(
-          videoId,
-          JSON.stringify({
-            ...(await this.getVideoStatusFromRedis(videoId)),
-            status: 'failed',
-            error: err.message,
-          }),
-        );
+        await this.redisHelper.set(videoId, {
+          ...(await this.redisHelper.get<VideoStatus | undefined>(videoId)),
+          status: 'failed',
+          error: err.message,
+        });
         console.error(
           `An error occurred during HLS conversion for ${videoId}:`,
           err.message,
         );
       })
       .run();
-  }
-
-  private async getVideoStatusFromRedis(
-    videoId: string,
-  ): Promise<VideoStatus | undefined> {
-    const statusJson = await this.cacheManager.get<string>(videoId);
-
-    if (!statusJson) {
-      return undefined;
-    }
-
-    try {
-      const statusObject = JSON.parse(statusJson);
-      return statusObject;
-    } catch (error) {
-      console.error(`Failed to parse JSON for videoId: ${videoId}`, error);
-      return undefined;
-    }
   }
 
   async getVideoStatus(
@@ -181,6 +155,6 @@ export class VideosService {
       return undefined;
     }
 
-    return await this.getVideoStatusFromRedis(videoId);
+    return await this.redisHelper.get<VideoStatus | undefined>(videoId);
   }
 }
