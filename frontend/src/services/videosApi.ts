@@ -16,6 +16,13 @@ interface ApiErrorResponse {
   error?: string;
 }
 
+export interface VideoStatus {
+  status: "pending" | "processing" | "completed" | "failed";
+  originalFileName?: string | undefined;
+  processedPath?: string;
+  error?: string;
+}
+
 export const uploadVideoApi = async (file: File): Promise<VideoData> => {
   const formData = new FormData();
   formData.append("file", file);
@@ -39,6 +46,25 @@ export const uploadVideoApi = async (file: File): Promise<VideoData> => {
     fileName: null,
   };
   return newVideoData;
+};
+
+export const checkVideoStatusApi = async (
+  videoId: string
+): Promise<VideoStatus> => {
+  const response = await apiClient.get(`/videos/status/` + videoId);
+
+  if (response.status !== 200) {
+    const errorData: ApiErrorResponse = response.data;
+    const errorMessage =
+      errorData.message ||
+      errorData.error ||
+      `Failed to check video status. Status: ${response.status} - ${
+        response.statusText || "Unknown error"
+      }`;
+    throw new Error(errorMessage);
+  }
+
+  return response.data;
 };
 
 export const getVideosApi = async (): Promise<VideoData[]> => {

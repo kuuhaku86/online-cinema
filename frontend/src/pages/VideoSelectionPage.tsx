@@ -18,6 +18,7 @@ const VideoSelectionPage: React.FC = () => {
     uploadError,
     uploadSuccess,
     clearUploadStatus,
+    videoStatus,
   } = useVideos();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,9 +71,16 @@ const VideoSelectionPage: React.FC = () => {
           {uploadSuccess && (
             <p className="mt-2 text-green-500">Video uploaded successfully!</p>
           )}
+          {videoStatus && (
+            <p className="mt-2 text-green-500">{`Video Status: ${videoStatus.status}`}</p>
+          )}
           <button
             className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50"
-            disabled={!uploadSuccess}
+            disabled={
+              !uploadSuccess ||
+              !videoStatus ||
+              videoStatus.status !== "completed"
+            }
           >
             Start Room
           </button>
