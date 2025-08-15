@@ -32,7 +32,18 @@ export class RoomsController {
   @UseGuards(AuthGuard('jwt'))
   @Post(':roomCode/join')
   @HttpCode(HttpStatus.OK)
-  async joinRoom(
+  async join(
+    @Param('roomCode') roomCode: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<Room> {
+    const userId = req.user.id;
+    return this.RoomsService.joinRoom(roomCode, userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':roomCode/start')
+  @HttpCode(HttpStatus.OK)
+  async start(
     @Param('roomCode') roomCode: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<Room> {

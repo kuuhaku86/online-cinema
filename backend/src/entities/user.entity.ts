@@ -19,22 +19,27 @@ export class User {
   @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @Column({ type: 'varchar' })
+  @Column({
+    name: 'password_hash',
+    type: 'varchar',
+  })
   passwordHash: string;
 
   @Column({
+    name: 'current_hashed_refresh_token',
     type: 'varchar',
     nullable: true,
   })
   currentHashedRefreshToken: string | null;
 
-  @Column({ nullable: true, length: 100 })
-  name?: string;
-
-  @CreateDateColumn()
+  @CreateDateColumn({
+    name: 'created_at',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({
+    name: 'updated_at',
+  })
   updatedAt: Date;
 
   @OneToMany(() => Video, (video) => video.user)

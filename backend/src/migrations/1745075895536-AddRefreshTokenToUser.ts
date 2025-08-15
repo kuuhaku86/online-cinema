@@ -7,7 +7,7 @@ export class AddRefreshTokenToUser1745075895536 implements MigrationInterface {
     await queryRunner.addColumn(
       'users',
       new TableColumn({
-        name: 'currentHashedRefreshToken',
+        name: 'current_hashed_refresh_token',
         type: 'varchar',
         isNullable: true,
       }),
@@ -15,6 +15,6 @@ export class AddRefreshTokenToUser1745075895536 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropColumn('users', 'currentHashedRefreshToken');
+    await queryRunner.dropColumn('users', 'current_hashed_refresh_token');
   }
 }

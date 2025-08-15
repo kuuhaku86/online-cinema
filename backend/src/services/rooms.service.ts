@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Room } from '../entities/room.entity';
@@ -15,8 +19,9 @@ export class RoomsService {
     const shortCode = uuidv4().replace(/-/g, '').substring(0, 6);
 
     const newRoom = this.roomRepository.create({
-      user_ids: [userId],
-      short_code: shortCode,
+      userIds: [userId],
+      ownerId: userId,
+      shortCode,
     });
 
     const savedRoom = await this.roomRepository.save(newRoom);
@@ -26,18 +31,39 @@ export class RoomsService {
 
   async joinRoom(roomCode: string, userId: string): Promise<Room> {
     const room = await this.roomRepository.findOne({
-      where: { short_code: roomCode },
+      where: { shortCode: roomCode },
     });
 
     if (!room) {
       throw new NotFoundException(`Room with code "${roomCode}" not found.`);
     }
 
-    if (!room.user_ids.includes(userId)) {
-      room.user_ids.push(userId);
+    if (!room.active) {
+      throw new BadRequestException(`Room is not active`);
+    }
+
+    if (!room.userIds.includes(userId)) {
+      room.userIds.push(userId);
       return this.roomRepository.save(room);
     }
 
     return room;
+  }
+
+  async startRoom(roomCode: string, userId: string): Promise<Room> {
+    const room = await this.roomRepository.findOne({
+      where: { shortCode: roomCode, ownerId: userId },
+    });
+
+    if (!room) {
+      throw new NotFoundException(`Room with code "${roomCode}" not found.`);
+    }
+
+    if (room.active) {
+      throw new BadRequestException(`Room already active`);
+    }
+
+    room.active = true;
+    return this.roomRepository.save(room);
   }
 }
