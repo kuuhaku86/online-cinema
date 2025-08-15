@@ -1,5 +1,10 @@
 import { useState, useCallback } from "react";
-import { createRoomApi, joinRoomApi, RoomData } from "../services/roomsApi";
+import {
+  createRoomApi,
+  joinRoomApi,
+  RoomData,
+  startRoomApi,
+} from "../services/roomsApi";
 
 export const useRooms = () => {
   // State for creating a room
@@ -48,6 +53,28 @@ export const useRooms = () => {
     }
   }, []);
 
+  const startRoom = useCallback(
+    async (shortCode: string): Promise<RoomData> => {
+      setIsJoiningRoom(true);
+      setJoinRoomError(null);
+      try {
+        const startedRoomData = await startRoomApi(shortCode);
+        return startedRoomData;
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "An unknown error occurred while starting the room.";
+        setJoinRoomError(message);
+        console.error("Error joining room:", error);
+        throw error;
+      } finally {
+        setIsJoiningRoom(false);
+      }
+    },
+    []
+  );
+
   return {
     isCreatingRoom,
     createRoomError,
@@ -55,5 +82,6 @@ export const useRooms = () => {
     isJoiningRoom,
     joinRoomError,
     joinRoom,
+    startRoom,
   };
 };

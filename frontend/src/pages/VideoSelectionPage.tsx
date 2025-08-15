@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { VideoData } from "../services/videosApi";
 import { useVideos } from "../hooks/useVideos";
+import { useRooms } from "../hooks/useRooms";
 
 const VideoSelectionPage: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
-
   const {
     videos,
     loading,
@@ -20,6 +20,7 @@ const VideoSelectionPage: React.FC = () => {
     clearUploadStatus,
     videoStatus,
   } = useVideos();
+  const { startRoom } = useRooms();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -37,6 +38,16 @@ const VideoSelectionPage: React.FC = () => {
       setSelectedFile(null);
     } catch (error) {
       console.log("Error uploading video:", error);
+    }
+  };
+
+  const handeStartRoom = async () => {
+    if (!shortCode) return;
+    try {
+      await startRoom(shortCode);
+      console.log("Room started successfully!");
+    } catch (error) {
+      console.log("Error starting room:", error);
     }
   };
 
@@ -81,6 +92,7 @@ const VideoSelectionPage: React.FC = () => {
               !videoStatus ||
               videoStatus.status !== "completed"
             }
+            onClick={handeStartRoom}
           >
             Start Room
           </button>
@@ -153,6 +165,7 @@ const VideoSelectionPage: React.FC = () => {
             <button
               className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50"
               disabled={!selectedVideo}
+              onClick={handeStartRoom}
             >
               Start Room
             </button>

@@ -26,6 +26,8 @@ export class RoomsService {
 
     const savedRoom = await this.roomRepository.save(newRoom);
 
+    console.log(savedRoom);
+
     return savedRoom;
   }
 
