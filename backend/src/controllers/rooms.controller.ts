@@ -51,6 +51,6 @@ export class RoomsController {
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<Room> {
     const userId = req.user.id;
-    return this.RoomsService.startRoom(roomCode, startRoomDto.video_id, userId);
+    return this.RoomsService.startRoom(roomCode, startRoomDto.videoId, userId);
   }
 }

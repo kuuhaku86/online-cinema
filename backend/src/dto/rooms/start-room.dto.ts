@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -9,8 +10,9 @@ import {
 } from 'class-validator';
 
 export class StartRoomDto {
+  @Expose({ name: 'video_id' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
-  readonly video_id: string;
+  readonly videoId: string;
 }

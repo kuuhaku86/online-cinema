@@ -47,8 +47,13 @@ export const joinRoomApi = async (shortCode: string): Promise<RoomData> => {
   return data;
 };
 
-export const startRoomApi = async (shortCode: string): Promise<RoomData> => {
-  const response = await apiClient.post(`/rooms/${shortCode}/start`);
+export const startRoomApi = async (
+  shortCode: string,
+  videoId: string
+): Promise<RoomData> => {
+  const response = await apiClient.post(`/rooms/${shortCode}/start`, {
+    video_id: videoId,
+  });
 
   if (response.status !== 200) {
     const errorData: ApiErrorResponse = response.data;

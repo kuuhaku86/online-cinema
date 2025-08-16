@@ -85,6 +85,7 @@ export class RoomsService {
     }
 
     room.active = true;
+    room.videoId = videoId;
     return this.roomRepository.save(room);
   }
 }

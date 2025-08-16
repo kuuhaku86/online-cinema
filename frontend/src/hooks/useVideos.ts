@@ -8,7 +8,8 @@ import {
 } from "../services/videosApi";
 
 export const useVideos = () => {
-  const [videos, setVideos] = useState<VideoData[]>([]);
+  const [videoOptions, setVideoOptions] = useState<VideoData[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
   const [videoStatus, setVideoStatus] = useState<VideoStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +24,7 @@ export const useVideos = () => {
     setError(null);
     try {
       const fetchedVideos = await getVideosApi();
-      setVideos(fetchedVideos);
+      setVideoOptions(fetchedVideos);
     } catch (err) {
       setError("Failed to fetch videos.");
       console.error("Error on fetching videos", err);
@@ -83,6 +84,7 @@ export const useVideos = () => {
     setVideoStatus(null);
     try {
       const video = await uploadVideoApi(file);
+      setSelectedVideo(video);
       setUploadSuccess(true);
       setPollingVideoId(video.id);
     } catch (error) {
@@ -100,7 +102,7 @@ export const useVideos = () => {
   }, []);
 
   return {
-    videos,
+    videoOptions,
     loading,
     error,
     uploadVideo,
@@ -109,5 +111,7 @@ export const useVideos = () => {
     uploadSuccess,
     clearUploadStatus,
     videoStatus,
+    setSelectedVideo,
+    selectedVideo,
   };
 };

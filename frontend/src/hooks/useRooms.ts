@@ -54,11 +54,11 @@ export const useRooms = () => {
   }, []);
 
   const startRoom = useCallback(
-    async (shortCode: string): Promise<RoomData> => {
+    async (shortCode: string, videoId: string): Promise<RoomData> => {
       setIsJoiningRoom(true);
       setJoinRoomError(null);
       try {
-        const startedRoomData = await startRoomApi(shortCode);
+        const startedRoomData = await startRoomApi(shortCode, videoId);
         return startedRoomData;
       } catch (error) {
         const message =

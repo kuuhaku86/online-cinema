@@ -8,9 +8,10 @@ const VideoSelectionPage: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
   const {
-    videos,
+    videoOptions,
+    selectedVideo,
+    setSelectedVideo,
     loading,
     error: fetchError,
     uploadVideo,
@@ -43,8 +44,10 @@ const VideoSelectionPage: React.FC = () => {
 
   const handeStartRoom = async () => {
     if (!shortCode) return;
+    if (!selectedVideo) return;
+
     try {
-      await startRoom(shortCode);
+      await startRoom(shortCode, selectedVideo.id);
       console.log("Room started successfully!");
     } catch (error) {
       console.log("Error starting room:", error);
@@ -145,7 +148,7 @@ const VideoSelectionPage: React.FC = () => {
                 )}
                 {!loading &&
                   !fetchError &&
-                  videos.map((video) => (
+                  videoOptions.map((video) => (
                     <li key={video.id}>
                       <a
                         href="#"

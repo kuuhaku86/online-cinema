@@ -42,6 +42,12 @@ export class Room {
   })
   active: boolean;
 
+  @Column({
+    name: 'video_id',
+    type: 'varchar',
+  })
+  videoId: string;
+
   @CreateDateColumn({
     name: 'created_at',
   })
