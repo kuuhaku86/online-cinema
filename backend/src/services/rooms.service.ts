@@ -14,6 +14,7 @@ export class RoomsService {
   constructor(
     @InjectRepository(Room)
     private readonly roomRepository: Repository<Room>,
+    @InjectRepository(Video)
     private readonly videoRepository: Repository<Video>,
   ) {}
 
