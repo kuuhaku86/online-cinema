@@ -26,6 +26,12 @@ export class Video {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Column({
+    type: 'boolean',
+    default: () => "'false'",
+  })
+  ready: boolean;
+
   @CreateDateColumn({
     name: 'created_at',
   })

@@ -10,6 +10,7 @@ export class CreateUsersTable1744989899083 implements MigrationInterface {
                 "username" character varying(50) NOT NULL,
                 "email" character varying NOT NULL,
                 "password_hash" character varying NOT NULL,
+                "current_hashed_refresh_token" character varying,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
                 CONSTRAINT "UQ_fe0bb3f6520ee0469504521e710" UNIQUE ("username"),

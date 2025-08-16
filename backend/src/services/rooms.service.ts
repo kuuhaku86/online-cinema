@@ -7,12 +7,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Room } from '../entities/room.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { Video } from 'src/entities/video.entity';
 
 @Injectable()
 export class RoomsService {
   constructor(
     @InjectRepository(Room)
     private readonly roomRepository: Repository<Room>,
+    private readonly videoRepository: Repository<Video>,
   ) {}
 
   async createRoom(userId: string): Promise<Room> {
@@ -52,7 +54,11 @@ export class RoomsService {
     return room;
   }
 
-  async startRoom(roomCode: string, userId: string): Promise<Room> {
+  async startRoom(
+    roomCode: string,
+    videoId: string,
+    userId: string,
+  ): Promise<Room> {
     const room = await this.roomRepository.findOne({
       where: { shortCode: roomCode, ownerId: userId },
     });
@@ -63,6 +69,18 @@ export class RoomsService {
 
     if (room.active) {
       throw new BadRequestException(`Room already active`);
+    }
+
+    const video = await this.videoRepository.findOne({
+      where: { id: videoId },
+    });
+
+    if (!video) {
+      throw new NotFoundException(`Video with ID "${videoId}" not found.`);
+    }
+
+    if (!video.ready) {
+      throw new BadRequestException(`Video is not ready`);
     }
 
     room.active = true;

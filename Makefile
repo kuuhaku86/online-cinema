@@ -42,3 +42,9 @@ ssh-backend:
 
 ssh-frontend:
 	docker exec -it online-cinema-frontend bash
+
+create-migration-backend:
+	docker exec -it online-cinema-backend npm run migration:create
+
+run-migration-backend:
+	docker exec -it online-cinema-backend npm run migration:run

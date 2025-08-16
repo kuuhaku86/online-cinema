@@ -9,6 +9,7 @@ export class CreateVideosTable1752073104482 implements MigrationInterface {
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "user_id" uuid NOT NULL,
         "file_name" character varying NOT NULL,
+        "ready" boolean NOT NULL DEFAULT false,
         "created_at" TIMESTAMP NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
         CONSTRAINT "PK_videos_id" PRIMARY KEY ("id"),

@@ -87,7 +87,6 @@ export class VideosService {
     videoId: string,
   ) {
     const inputPath = file.path;
-    // Create a dedicated directory for this video's HLS files
     const hlsOutputDir = join(this.outputDir, videoId);
     await fs.mkdir(hlsOutputDir, { recursive: true });
 
@@ -122,6 +121,9 @@ export class VideosService {
           ...(await this.redisHelper.get<VideoStatus | undefined>(videoId)),
           status: 'completed',
           processedPath: manifestPath,
+        });
+        await this.videoRepository.update(videoId, {
+          ready: true,
         });
         console.log(`FFmpeg HLS processing finished for ${videoId}`);
       })
