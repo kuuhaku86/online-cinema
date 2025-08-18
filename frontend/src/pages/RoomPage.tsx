@@ -1,6 +1,11 @@
 import React from "react";
+import { useVideos } from "../hooks/useVideos";
 
 const RoomPage: React.FC = () => {
+  const { selectedVideo } = useVideos();
+
+  console.log("Selected Video", selectedVideo);
+
   return (
     <div className="h-[90vh] flex flex-col">
       {/* Parent 2: Flex container for columns. Removed h-screen and min-h-screen. flex-1 will make it fill Parent 1. */}

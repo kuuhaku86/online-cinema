@@ -6,7 +6,7 @@ export interface VideoData {
 }
 
 interface RawVideoApiResponse {
-  videoId: string;
+  id: string;
   fileName: string | null;
   message: string | null;
 }
@@ -42,7 +42,7 @@ export const uploadVideoApi = async (file: File): Promise<VideoData> => {
 
   const rawData: RawVideoApiResponse = response.data;
   const newVideoData: VideoData = {
-    id: rawData.videoId,
+    id: rawData.id,
     fileName: null,
   };
   return newVideoData;
@@ -83,7 +83,7 @@ export const getVideosApi = async (): Promise<VideoData[]> => {
   const rawData: RawVideoApiResponse[] = response.data;
 
   return rawData.map((video) => ({
-    id: video.videoId,
+    id: video.id,
     fileName: video.fileName,
   }));
 };

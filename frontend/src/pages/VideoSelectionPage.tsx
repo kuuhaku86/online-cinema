@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import { VideoData } from "../services/videosApi";
+import { useNavigate, useParams } from "react-router-dom";
 import { useVideos } from "../hooks/useVideos";
 import { useRooms } from "../hooks/useRooms";
 
@@ -8,6 +7,8 @@ const VideoSelectionPage: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const navigate = useNavigate();
+
   const {
     videoOptions,
     selectedVideo,
@@ -47,8 +48,10 @@ const VideoSelectionPage: React.FC = () => {
     if (!selectedVideo) return;
 
     try {
+      console.log(selectedVideo);
       await startRoom(shortCode, selectedVideo.id);
       console.log("Room started successfully!");
+      navigate(`/room/${shortCode}`);
     } catch (error) {
       console.log("Error starting room:", error);
     }

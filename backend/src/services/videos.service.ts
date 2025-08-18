@@ -73,7 +73,7 @@ export class VideosService {
 
     return {
       message: 'Video uploaded successfully',
-      videoId: savedVideo.id,
+      id: savedVideo.id,
     };
   }
 
