@@ -11,11 +11,15 @@ import {
   Get,
   Param,
   NotFoundException,
+  Res,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { VideosService } from '../services/videos.service';
 import { User } from '../entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import { join } from 'path';
+import { RoomsService } from 'src/services/rooms.service';
 
 interface RequestWithAuthenticatedUser extends Request {
   user: Pick<User, 'id'>;
@@ -23,7 +27,10 @@ interface RequestWithAuthenticatedUser extends Request {
 
 @Controller('videos')
 export class VideosController {
-  constructor(private readonly videosService: VideosService) {}
+  constructor(
+    private readonly videosService: VideosService,
+    private readonly roomsService: RoomsService,
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
@@ -64,5 +71,37 @@ export class VideosController {
       throw new NotFoundException('Video ID not found.');
     }
     return status;
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('stream/:roomShortCode/:videoId/:file')
+  async streamFile(
+    @Param('roomShortCode') roomShortCode: string,
+    @Param('videoId') videoId: string,
+    @Param('file') file: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() res: Response,
+  ) {
+    if (!file.endsWith('.m3u8') && !file.endsWith('.ts')) {
+      throw new BadRequestException('Unsupported file type.');
+    }
+
+    const hasAccess = await this.roomsService.checkUserAccessToRoomAndVideo(
+      roomShortCode,
+      videoId,
+      req.user.id,
+    );
+
+    if (!hasAccess) {
+      throw new NotFoundException('Video not found or access denied.');
+    }
+
+    if (file.includes('..')) {
+      throw new BadRequestException('Invalid file path.');
+    }
+
+    const filePath = join(process.cwd(), 'uploads', videoId, file);
+
+    res.sendFile(filePath);
   }
 }

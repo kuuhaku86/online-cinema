@@ -88,4 +88,23 @@ export class RoomsService {
     room.videoId = videoId;
     return this.roomRepository.save(room);
   }
+
+  async checkUserAccessToRoomAndVideo(
+    roomShortCode: string,
+    videoId: string,
+    userId: string,
+  ) {
+    const room = await this.roomRepository.findOneBy({
+      shortCode: roomShortCode,
+      videoId,
+    });
+
+    if (!room) {
+      throw new NotFoundException(
+        `Room with ID "${roomShortCode}" and Video ID "${videoId}" not found.`,
+      );
+    }
+
+    return room?.userIds.includes(userId);
+  }
 }

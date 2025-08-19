@@ -7,11 +7,13 @@ import { diskStorage } from 'multer';
 import { Video } from 'src/entities/video.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HelpersModule } from './helpers.module';
+import { RoomsModule } from './rooms.module';
 
 @Module({
   imports: [
     AuthModule,
     HelpersModule,
+    RoomsModule,
     TypeOrmModule.forFeature([Video]),
     MulterModule.register({
       storage: diskStorage({
