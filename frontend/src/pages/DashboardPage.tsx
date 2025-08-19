@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRooms } from "../hooks/useRooms";
+import { AppDispatch } from "../store";
+import { useDispatch } from "react-redux";
+import { setSelectedVideoId } from "../features/video/videoSlice";
 
 const DashboardPage: React.FC = () => {
   const [shortCode, setShortCode] = useState("");
   const navigate = useNavigate();
+  const dispatch: AppDispatch = useDispatch();
+
   const {
     createRoom,
     isCreatingRoom,
@@ -21,6 +26,7 @@ const DashboardPage: React.FC = () => {
     }
     try {
       const joinedRoomData = await joinRoom(shortCode);
+      dispatch(setSelectedVideoId(joinedRoomData.videoId));
       console.log("Successfully joined room:", joinedRoomData);
       navigate(`/room/${joinedRoomData.shortCode}`);
     } catch (error) {

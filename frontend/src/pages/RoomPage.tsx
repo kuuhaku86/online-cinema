@@ -1,10 +1,11 @@
 import React from "react";
-import { useVideos } from "../hooks/useVideos";
+import { getSelectedVideoId } from "../features/video/videoSlice";
+import { useSelector } from "react-redux";
 
 const RoomPage: React.FC = () => {
-  const { selectedVideo } = useVideos();
+  const selectedVideoId = useSelector(getSelectedVideoId);
 
-  console.log("Selected Video", selectedVideo);
+  console.log("Selected Video", selectedVideoId);
 
   return (
     <div className="h-[90vh] flex flex-col">

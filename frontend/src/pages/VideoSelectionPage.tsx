@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useVideos } from "../hooks/useVideos";
 import { useRooms } from "../hooks/useRooms";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store";
+import { setSelectedVideoId } from "../features/video/videoSlice";
 
 const VideoSelectionPage: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const navigate = useNavigate();
+  const dispatch: AppDispatch = useDispatch();
 
   const {
     videoOptions,
@@ -49,6 +53,7 @@ const VideoSelectionPage: React.FC = () => {
 
     try {
       console.log(selectedVideo);
+      dispatch(setSelectedVideoId(selectedVideo.id));
       await startRoom(shortCode, selectedVideo.id);
       console.log("Room started successfully!");
       navigate(`/room/${shortCode}`);
