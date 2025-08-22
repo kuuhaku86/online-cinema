@@ -74,7 +74,39 @@ export class VideosController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('stream/:roomShortCode/:videoId/:file')
+  @Get('stream-detail/:roomShortCode/:videoId')
+  async streamDetail(
+    @Param('roomShortCode') roomShortCode: string,
+    @Param('videoId') videoId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ) {
+    const currentUser = req.user;
+
+    const hasAccess = await this.roomsService.checkUserAccessToRoomAndVideo(
+      roomShortCode,
+      videoId,
+      currentUser.id,
+    );
+
+    if (!hasAccess) {
+      throw new NotFoundException('Video not found or access denied.');
+    }
+
+    const streamDetail = await this.videosService.getStreamDetail(
+      currentUser.id,
+      roomShortCode,
+      videoId,
+    );
+
+    if (!streamDetail) {
+      throw new NotFoundException('Video not found.');
+    }
+
+    return streamDetail;
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('stream/:token/:roomShortCode/:videoId/:file')
   async streamFile(
     @Param('roomShortCode') roomShortCode: string,
     @Param('videoId') videoId: string,

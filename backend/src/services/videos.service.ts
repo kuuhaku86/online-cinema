@@ -11,12 +11,17 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import * as ffmpeg from 'fluent-ffmpeg';
 import { RedisHelper } from 'src/helpers/redis.helper';
+import { AuthService } from './auth.service';
 
 type VideoStatus = {
   status: 'pending' | 'processing' | 'completed' | 'failed';
   originalFileName?: string | undefined;
   processedPath?: string;
   error?: string;
+};
+
+type StreamDetail = {
+  urlStream: string;
 };
 
 @Injectable()
@@ -28,6 +33,7 @@ export class VideosService {
     @InjectRepository(Video)
     private readonly videoRepository: Repository<Video>,
     @Inject(forwardRef(() => RedisHelper)) readonly redisHelper: RedisHelper,
+    private readonly authService: AuthService,
   ) {
     this.createDirectories();
   }
@@ -160,4 +166,32 @@ export class VideosService {
     return await this.redisHelper.get<VideoStatus | undefined>(videoId);
   }
 
+  async getStreamDetail(
+    userId: string,
+    roomShortCode: string,
+    videoId: string,
+  ): Promise<StreamDetail | undefined> {
+    const video = await this.videoRepository.findOneBy({
+      id: videoId,
+      userId,
+    });
+
+    if (!video) {
+      return undefined;
+    }
+
+    const token = await this.authService.generateStreamToken(
+      userId,
+      roomShortCode,
+      videoId,
+    );
+
+    const urlStream = `${process.env.APP_URL}/api/videos/stream/${token}/${roomShortCode}/${videoId}/master.m3u8`;
+
+    const streamDetail = {
+      urlStream,
+    };
+
+    return streamDetail;
+  }
 }

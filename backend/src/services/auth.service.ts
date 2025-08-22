@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, Inject, forwardRef } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '../entities/user.entity';
@@ -18,7 +23,7 @@ interface RefreshTokenPayload {
 export class AuthService {
   constructor(
     @Inject(forwardRef(() => UsersService)) // Use forwardRef for UsersService injection
-    private usersService: UsersService, 
+    private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
@@ -129,6 +134,25 @@ export class AuthService {
       return result;
     }
     return null;
+  }
+
+  async generateStreamToken(
+    userId: string,
+    roomShortCode: string,
+    videoId: string,
+  ) {
+    const payload = {
+      userId: userId,
+      roomShortCode: roomShortCode,
+      videoId: videoId,
+    };
+
+    const token = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '4h',
+    });
+
+    return token;
   }
 
   private async updateRefreshTokenHash(

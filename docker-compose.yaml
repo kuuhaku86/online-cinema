@@ -19,6 +19,7 @@ services:
       - JWT_REFRESH_EXPIRATION=3600s
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - APP_URL=http://192.168.0.10:3000
     depends_on:
       - db
       - redis
