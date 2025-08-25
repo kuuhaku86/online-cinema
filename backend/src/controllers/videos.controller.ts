@@ -20,9 +20,18 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { join } from 'path';
 import { RoomsService } from 'src/services/rooms.service';
+import { UrlTokenGuard } from 'src/auth/guards/url-token.guard';
 
 interface RequestWithAuthenticatedUser extends Request {
   user: Pick<User, 'id'>;
+}
+
+interface RequestWithAuthenticatedPayloadForUrl extends Request {
+  payload: {
+    userId: string;
+    roomShortCode: string;
+    videoId: string;
+  };
 }
 
 @Controller('videos')
@@ -105,13 +114,13 @@ export class VideosController {
     return streamDetail;
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UrlTokenGuard)
   @Get('stream/:token/:roomShortCode/:videoId/:file')
   async streamFile(
     @Param('roomShortCode') roomShortCode: string,
     @Param('videoId') videoId: string,
     @Param('file') file: string,
-    @Req() req: RequestWithAuthenticatedUser,
+    @Req() req: RequestWithAuthenticatedPayloadForUrl,
     @Res() res: Response,
   ) {
     if (!file.endsWith('.m3u8') && !file.endsWith('.ts')) {
@@ -121,7 +130,7 @@ export class VideosController {
     const hasAccess = await this.roomsService.checkUserAccessToRoomAndVideo(
       roomShortCode,
       videoId,
-      req.user.id,
+      req.payload.userId,
     );
 
     if (!hasAccess) {
