@@ -143,6 +143,12 @@ export class VideosController {
 
     const filePath = join(process.cwd(), 'uploads', videoId, file);
 
+    if (file.endsWith('.m3u8')) {
+      res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+    } else if (file.endsWith('.ts')) {
+      res.setHeader('Content-Type', 'video/MP2T');
+    }
+
     res.sendFile(filePath);
   }
 }

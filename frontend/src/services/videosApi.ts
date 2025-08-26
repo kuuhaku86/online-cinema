@@ -16,6 +16,10 @@ interface ApiErrorResponse {
   error?: string;
 }
 
+export interface StreamDetail {
+  urlStream?: string;
+}
+
 export interface VideoStatus {
   status: "pending" | "processing" | "completed" | "failed";
   originalFileName?: string | undefined;
@@ -86,4 +90,25 @@ export const getVideosApi = async (): Promise<VideoData[]> => {
     id: video.id,
     fileName: video.fileName,
   }));
+};
+
+export const getVideoDetailApi = async (
+  roomShortCode: string,
+  videoId: string
+): Promise<StreamDetail> => {
+  const response = await apiClient.get(
+    `/videos/stream-detail/${roomShortCode}/${videoId}`
+  );
+  if (response.status !== 200) {
+    const errorData: ApiErrorResponse = response.data;
+    const errorMessage =
+      errorData.message ||
+      errorData.error ||
+      `Failed to get video detail. Status: ${response.status} - ${
+        response.statusText || "Unknown error"
+      }`;
+    throw new Error(errorMessage);
+  }
+
+  return response.data;
 };

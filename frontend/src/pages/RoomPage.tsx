@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { getSelectedVideoId } from "../features/video/videoSlice";
 import { useSelector } from "react-redux";
+import { useVideos } from "../hooks/useVideos";
+import { useParams } from "react-router-dom";
+import { ReactShakaPlayer } from "@mkhuda/react-shaka-player";
+import "@mkhuda/react-shaka-player/dist/ui.css"; // or similar path
 
 const RoomPage: React.FC = () => {
   const selectedVideoId = useSelector(getSelectedVideoId);
+  const { shortCode } = useParams<{ shortCode: string }>();
+  const { videoStreamDetail, fetchVideoStreamDetail } = useVideos();
+
+  useEffect(() => {
+    if (selectedVideoId && shortCode) {
+      fetchVideoStreamDetail(shortCode, selectedVideoId);
+    }
+  }, [selectedVideoId, shortCode, fetchVideoStreamDetail]);
 
   console.log("Selected Video", selectedVideoId);
 
@@ -15,9 +27,12 @@ const RoomPage: React.FC = () => {
         <div className="flex-1 p-5 flex flex-col justify-center items-center text-center"></div>
         {/* Column 2 */}
         <div className="flex-1 p-5 flex flex-col justify-center items-center text-center">
-          <p className="text-8xl font-bold text-gray-800 dark:text-white mb-4">
-            Test
-          </p>
+          {videoStreamDetail && (
+            <ReactShakaPlayer
+              autoPlay={true}
+              src={videoStreamDetail!.urlStream}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mkhuda/react-shaka-player": "^1.2.2",
     "@reduxjs/toolkit": "^2.7.0",
     "@tailwindcss/vite": "^4.1.4",
     "axios": "^1.9.0",
@@ -19,6 +20,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.5.2",
     "redux": "^5.0.1",
+    "shaka-player": "^4.16.0",
     "tailwind": "^4.0.0"
   },
   "devDependencies": {

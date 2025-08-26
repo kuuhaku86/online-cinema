@@ -5,9 +5,20 @@ interface VideoState {
   selectedVideoId: string | null;
 }
 
-const initialState: VideoState = {
-  selectedVideoId: null,
+const loadInitialState = (): VideoState => {
+  try {
+    const serializedId = localStorage.getItem("selectedVideoId");
+    if (serializedId === null) {
+      return { selectedVideoId: null };
+    }
+    return { selectedVideoId: JSON.parse(serializedId) };
+  } catch (err) {
+    console.warn("Could not load selected video ID from storage", err);
+    return { selectedVideoId: null };
+  }
 };
+
+const initialState: VideoState = loadInitialState();
 
 const videoSlice = createSlice({
   name: "video",

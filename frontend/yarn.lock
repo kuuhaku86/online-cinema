@@ -464,6 +464,13 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@mkhuda/react-shaka-player@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@mkhuda/react-shaka-player/-/react-shaka-player-1.2.2.tgz#5d68f77c0fb612f9fb8a8cc9a9da6e5c87cd0705"
+  integrity sha512-CF+KKsu4cgFDKtM9F5UlRcSYXI4RzCP9Bo4KpbLB6afWiXfikgt60yAxC6PL5kXYAH0bj82jas7Jb2quDvohag==
+  dependencies:
+    shaka-player "^3.3.7"
+
 "@napi-rs/wasm-runtime@^0.2.8":
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/@napi-rs/wasm-runtime/-/wasm-runtime-0.2.9.tgz#7278122cf94f3b36d8170a8eee7d85356dfa6a96"
@@ -1483,6 +1490,11 @@ electron-to-chromium@^1.5.73:
   version "1.5.136"
   resolved "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.136.tgz"
   integrity sha512-kL4+wUTD7RSA5FHx5YwWtjDnEEkIIikFgWHR4P6fqjw1PPLlqYkxeOb++wAauAssat0YClCy8Y3C5SxgSkjibQ==
+
+eme-encryption-scheme-polyfill@^2.1.1:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/eme-encryption-scheme-polyfill/-/eme-encryption-scheme-polyfill-2.2.3.tgz#420608d56b995dfc440cfefba3cc06faaf02a95d"
+  integrity sha512-N0nlJZVaBqGWzvvFb6ZAxvTVeZ4v9cXCzrSFE0zCbNbviiygWI0gDJiRc4o5SqFrPVYBSQr5z5SzKjIvvxL+Vw==
 
 encodeurl@~1.0.2:
   version "1.0.2"
@@ -3268,6 +3280,18 @@ sha-1@0.1.1:
   version "0.1.1"
   resolved "https://registry.npmjs.org/sha-1/-/sha-1-0.1.1.tgz"
   integrity sha512-dexizf3hB7d4Jq6Cd0d/NYQiqgEqIfZIpuMfwPfvSb6h06DZKmHyUe55jYwpHC12R42wpqXO6ouhiBpRzIcD/g==
+
+shaka-player@^3.3.7:
+  version "3.3.19"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-3.3.19.tgz#ab94898517cb72b7505e009e462e13b827206252"
+  integrity sha512-tZowO6D2nlKTYQadiAZ5LcjhJSW5/OO8UVkEax3llgDTusFkjoV1CQCXYVks80pDLAwTWC6kwY5JDobWwC9mJw==
+  dependencies:
+    eme-encryption-scheme-polyfill "^2.1.1"
+
+shaka-player@^4.16.0:
+  version "4.16.0"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-4.16.0.tgz#0d97eb8647e2c356f0f8f4285c18fe71edc69613"
+  integrity sha512-LqwwtuqFDn0QgNkKjtRWeWDKXNwFm/LZM/1tMsnQ4eo8jGkAMES2pSEWzdhUtAgtBdaMNvl5E3VHJRuR3m2bWg==
 
 shebang-command@^2.0.0:
   version "2.0.0"

@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   checkVideoStatusApi,
+  getVideoDetailApi,
   getVideosApi,
+  StreamDetail,
   uploadVideoApi,
   VideoData,
   VideoStatus,
@@ -18,6 +20,9 @@ export const useVideos = () => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [pollingVideoId, setPollingVideoId] = useState<string | null>(null);
+
+  const [videoStreamDetail, setVideoStreamDetail] =
+    useState<StreamDetail | null>(null);
 
   const fetchVideos = useCallback(async () => {
     setLoading(true);
@@ -101,6 +106,27 @@ export const useVideos = () => {
     setUploadSuccess(false);
   }, []);
 
+  const fetchVideoStreamDetail = useCallback(
+    async (roomShortCode: string, videoId: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const fetchedStreamDetail = await getVideoDetailApi(
+          roomShortCode,
+          videoId
+        );
+
+        setVideoStreamDetail(fetchedStreamDetail);
+      } catch (err) {
+        setError("Failed to stream detail.");
+        console.error("Error on stream detail", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     videoOptions,
     loading,
@@ -113,5 +139,7 @@ export const useVideos = () => {
     videoStatus,
     setSelectedVideo,
     selectedVideo,
+    fetchVideoStreamDetail,
+    videoStreamDetail,
   };
 };
