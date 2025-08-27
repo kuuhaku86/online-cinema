@@ -3,8 +3,7 @@ import { getSelectedVideoId } from "../features/video/videoSlice";
 import { useSelector } from "react-redux";
 import { useVideos } from "../hooks/useVideos";
 import { useParams } from "react-router-dom";
-import { ReactShakaPlayer } from "@mkhuda/react-shaka-player";
-import "@mkhuda/react-shaka-player/dist/ui.css"; // or similar path
+import ReactPlayer from "react-player";
 
 const RoomPage: React.FC = () => {
   const selectedVideoId = useSelector(getSelectedVideoId);
@@ -24,16 +23,20 @@ const RoomPage: React.FC = () => {
       {/* Parent 2: Flex container for columns. Removed h-screen and min-h-screen. flex-1 will make it fill Parent 1. */}
       <div className="flex gap-5 flex-1">
         {/* Column 1 */}
-        <div className="flex-1 p-5 flex flex-col justify-center items-center text-center"></div>
-        {/* Column 2 */}
-        <div className="flex-1 p-5 flex flex-col justify-center items-center text-center">
+        <div className="flex-3 p-5 flex flex-col justify-center items-center text-center">
           {videoStreamDetail && (
-            <ReactShakaPlayer
-              autoPlay={true}
+            <ReactPlayer
               src={videoStreamDetail!.urlStream}
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+              controls
             />
           )}
         </div>
+        {/* Column 2 */}
+        <div className="flex-1 p-5 flex flex-col justify-center items-center text-center"></div>
       </div>
     </div>
   );
