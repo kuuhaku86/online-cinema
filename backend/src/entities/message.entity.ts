@@ -21,15 +21,9 @@ export class Message {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column()
-  userId: string;
-
   @ManyToOne(() => Room, (room) => room.messages, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'room_id' })
   room: Room;
-
-  @Column()
-  roomId: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

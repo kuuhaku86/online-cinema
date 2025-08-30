@@ -44,7 +44,11 @@ ssh-frontend:
 	docker exec -it online-cinema-frontend bash
 
 create-migration-backend:
-	docker exec -it online-cinema-backend npm run migration:create
+	docker exec -it online-cinema-backend npm run migration:create --name=$(NAME)
+	$(MAKE) fix-migration-permissions
 
 run-migration-backend:
 	docker exec -it online-cinema-backend npm run migration:run
+
+fix-migration-permissions:
+	docker exec -it online-cinema-backend find src/migrations -maxdepth 1 -type f -exec chmod 666 {} +
