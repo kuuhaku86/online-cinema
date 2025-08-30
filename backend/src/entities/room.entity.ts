@@ -5,9 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  OneToMany,
 } from 'typeorm';
-
-export type RoomStatus = 'waiting' | 'in-progress' | 'finished';
+import { Message } from './message.entity';
 
 @Entity('rooms')
 export class Room {
@@ -36,10 +36,7 @@ export class Room {
   })
   userIds: string[];
 
-  @Column({
-    type: 'boolean',
-    default: () => "'false'",
-  })
+  @Column({ default: false })
   active: boolean;
 
   @Column({
@@ -48,13 +45,12 @@ export class Room {
   })
   videoId: string;
 
-  @CreateDateColumn({
-    name: 'created_at',
-  })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({
-    name: 'updated_at',
-  })
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @OneToMany(() => Message, (message) => message.room)
+  messages: Message[];
 }
