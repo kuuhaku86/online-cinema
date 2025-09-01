@@ -11,6 +11,7 @@ import { VideosModule } from './videos.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from 'src/configs/redis-options.constants';
 import { HelpersModule } from './helpers.module';
+import { MessagesModule } from './messages.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { HelpersModule } from './helpers.module';
     AuthModule,
     RoomsModule,
     VideosModule,
+    MessagesModule,
     HelpersModule,
     CacheModule.register({ isGlobal: true }),
     CacheModule.registerAsync(RedisOptions),

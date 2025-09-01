@@ -107,4 +107,16 @@ export class RoomsService {
 
     return room?.userIds.includes(userId);
   }
+
+  async checkUserAccessToRoom(roomShortCode: string, userId: string) {
+    const room = await this.roomRepository.findOneBy({
+      shortCode: roomShortCode,
+    });
+
+    if (!room) {
+      throw new NotFoundException(`Room with ID "${roomShortCode}" not found.`);
+    }
+
+    return room?.userIds.includes(userId);
+  }
 }

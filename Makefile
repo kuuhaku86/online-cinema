@@ -49,6 +49,9 @@ create-migration-backend:
 
 run-migration-backend:
 	docker exec -it online-cinema-backend npm run migration:run
+	
+run-migration-rollback-backend:
+	docker exec -it online-cinema-backend npm run migration:revert
 
 fix-migration-permissions:
 	docker exec -it online-cinema-backend find src/migrations -maxdepth 1 -type f -exec chmod 666 {} +

@@ -20,12 +20,14 @@ import { AuthService } from '../services/auth.service';
 // This interface should ideally be in a shared types file.
 // It's based on the one in auth.controller.ts and assumes JWT strategy populates req.user similarly.
 interface RequestWithAuthenticatedUser extends Request {
-  user: Omit<User, 'passwordHash' | 'currentHashedRefreshToken'> & { id: string };
+  user: Omit<User, 'passwordHash' | 'currentHashedRefreshToken'> & {
+    id: string;
+  };
 }
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
@@ -53,10 +55,15 @@ export class UsersController {
   ): Promise<Omit<User, 'passwordHash' | 'currentHashedRefreshToken'>> {
     // Ensure the authenticated user is the one being updated
     if (req.user.id !== id) {
-      throw new ForbiddenException('You are not authorized to update this profile.');
+      throw new ForbiddenException(
+        'You are not authorized to update this profile.',
+      );
     }
 
-    console.log(`Updating profile for user ID: ${id} with data:`, updateUserDto);
+    console.log(
+      `Updating profile for user ID: ${id} with data:`,
+      updateUserDto,
+    );
     // The usersService.update method needs to be implemented.
     // It should handle finding the user by id, updating fields, and saving.
     // It should throw NotFoundException if the user isn't found.

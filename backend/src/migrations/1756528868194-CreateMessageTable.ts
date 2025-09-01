@@ -7,7 +7,7 @@ export class CreateMessageTable1756528868194 implements MigrationInterface {
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "text" text NOT NULL,
         "user_id" uuid NOT NULL,
-        "room_id" uuid NOT NULL,
+        "room_short_code" character varying(6) NOT NULL,
         "created_at" TIMESTAMP NOT NULL DEFAULT now()
       )
     `);

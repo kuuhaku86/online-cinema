@@ -6,7 +6,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 import { Room } from './room.entity';
 
 @Entity('messages')
@@ -17,13 +16,21 @@ export class Message {
   @Column('text')
   content: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE', eager: true })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @Column({
+    name: 'user_id',
+    type: 'varchar',
+  })
+  userId: string;
 
   @ManyToOne(() => Room, (room) => room.messages, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'room_id' })
+  @JoinColumn({ name: 'room_short_code', referencedColumnName: 'shortCode' })
   room: Room;
+
+  @Column({
+    name: 'room_short_code',
+    type: 'varchar',
+  })
+  roomShortCode: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
