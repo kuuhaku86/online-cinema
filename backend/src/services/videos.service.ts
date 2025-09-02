@@ -168,7 +168,7 @@ export class VideosService {
 
   async getStreamDetail(
     userId: string,
-    roomShortCode: string,
+    roomId: string,
     videoId: string,
   ): Promise<StreamDetail | undefined> {
     const video = await this.videoRepository.findOneBy({
@@ -182,11 +182,11 @@ export class VideosService {
 
     const token = await this.authService.generateStreamToken(
       userId,
-      roomShortCode,
+      roomId,
       videoId,
     );
 
-    const urlStream = `${process.env.APP_URL}/api/videos/stream/${token}/${roomShortCode}/${videoId}/master.m3u8`;
+    const urlStream = `${process.env.APP_URL}/api/videos/stream/${token}/${roomId}/${videoId}/master.m3u8`;
 
     const streamDetail = {
       urlStream,

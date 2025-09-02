@@ -39,37 +39,37 @@ export class RoomsController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post(':roomCode/join')
+  @Post(':roomShortCode/join')
   @HttpCode(HttpStatus.OK)
   async join(
-    @Param('roomCode') roomCode: string,
+    @Param('roomShortCode') roomShortCode: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<Room> {
     const userId = req.user.id;
-    return this.roomsService.joinRoom(roomCode, userId);
+    return this.roomsService.joinRoom(roomShortCode, userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post(':roomCode/start')
+  @Post(':roomId/start')
   @HttpCode(HttpStatus.OK)
   async start(
-    @Param('roomCode') roomCode: string,
+    @Param('roomId') roomId: string,
     @Body() startRoomDto: StartRoomDto,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<Room> {
     const userId = req.user.id;
-    return this.roomsService.startRoom(roomCode, startRoomDto.videoId, userId);
+    return this.roomsService.startRoom(roomId, startRoomDto.videoId, userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get(':roomCode/messages')
+  @Get(':roomId/messages')
   @HttpCode(HttpStatus.OK)
   async messages(
-    @Param('roomCode') roomCode: string,
+    @Param('roomId') roomId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<Message[]> {
     const hasAccess = await this.roomsService.checkUserAccessToRoom(
-      roomCode,
+      roomId,
       req.user.id,
     );
 
@@ -77,6 +77,6 @@ export class RoomsController {
       throw new NotFoundException('Video not found or access denied.');
     }
 
-    return this.messagesService.getMessage(roomCode);
+    return this.messagesService.getMessage(roomId);
   }
 }

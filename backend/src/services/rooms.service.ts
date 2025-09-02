@@ -34,13 +34,15 @@ export class RoomsService {
     return savedRoom;
   }
 
-  async joinRoom(roomCode: string, userId: string): Promise<Room> {
+  async joinRoom(roomShortCode: string, userId: string): Promise<Room> {
     const room = await this.roomRepository.findOne({
-      where: { shortCode: roomCode },
+      where: { shortCode: roomShortCode },
     });
 
     if (!room) {
-      throw new NotFoundException(`Room with code "${roomCode}" not found.`);
+      throw new NotFoundException(
+        `Room with code "${roomShortCode}" not found.`,
+      );
     }
 
     if (!room.active) {
@@ -56,16 +58,16 @@ export class RoomsService {
   }
 
   async startRoom(
-    roomCode: string,
+    roomId: string,
     videoId: string,
     userId: string,
   ): Promise<Room> {
     const room = await this.roomRepository.findOne({
-      where: { shortCode: roomCode, ownerId: userId },
+      where: { id: roomId, ownerId: userId },
     });
 
     if (!room) {
-      throw new NotFoundException(`Room with code "${roomCode}" not found.`);
+      throw new NotFoundException(`Room with code "${roomId}" not found.`);
     }
 
     if (room.active) {
@@ -90,31 +92,31 @@ export class RoomsService {
   }
 
   async checkUserAccessToRoomAndVideo(
-    roomShortCode: string,
+    roomId: string,
     videoId: string,
     userId: string,
   ) {
     const room = await this.roomRepository.findOneBy({
-      shortCode: roomShortCode,
+      id: roomId,
       videoId,
     });
 
     if (!room) {
       throw new NotFoundException(
-        `Room with ID "${roomShortCode}" and Video ID "${videoId}" not found.`,
+        `Room with ID "${roomId}" and Video ID "${videoId}" not found.`,
       );
     }
 
     return room?.userIds.includes(userId);
   }
 
-  async checkUserAccessToRoom(roomShortCode: string, userId: string) {
+  async checkUserAccessToRoom(roomId: string, userId: string) {
     const room = await this.roomRepository.findOneBy({
-      shortCode: roomShortCode,
+      id: roomId,
     });
 
     if (!room) {
-      throw new NotFoundException(`Room with ID "${roomShortCode}" not found.`);
+      throw new NotFoundException(`Room with ID "${roomId}" not found.`);
     }
 
     return room?.userIds.includes(userId);

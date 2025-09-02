@@ -29,7 +29,7 @@ interface RequestWithAuthenticatedUser extends Request {
 interface RequestWithAuthenticatedPayloadForUrl extends Request {
   payload: {
     userId: string;
-    roomShortCode: string;
+    roomId: string;
     videoId: string;
   };
 }
@@ -83,16 +83,16 @@ export class VideosController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('stream-detail/:roomShortCode/:videoId')
+  @Get('stream-detail/:roomId/:videoId')
   async streamDetail(
-    @Param('roomShortCode') roomShortCode: string,
+    @Param('roomId') roomId: string,
     @Param('videoId') videoId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ) {
     const currentUser = req.user;
 
     const hasAccess = await this.roomsService.checkUserAccessToRoomAndVideo(
-      roomShortCode,
+      roomId,
       videoId,
       currentUser.id,
     );
@@ -103,7 +103,7 @@ export class VideosController {
 
     const streamDetail = await this.videosService.getStreamDetail(
       currentUser.id,
-      roomShortCode,
+      roomId,
       videoId,
     );
 
@@ -115,9 +115,9 @@ export class VideosController {
   }
 
   @UseGuards(UrlTokenGuard)
-  @Get('stream/:token/:roomShortCode/:videoId/:file')
+  @Get('stream/:token/:roomId/:videoId/:file')
   async streamFile(
-    @Param('roomShortCode') roomShortCode: string,
+    @Param('roomId') roomId: string,
     @Param('videoId') videoId: string,
     @Param('file') file: string,
     @Req() req: RequestWithAuthenticatedPayloadForUrl,
@@ -128,7 +128,7 @@ export class VideosController {
     }
 
     const hasAccess = await this.roomsService.checkUserAccessToRoomAndVideo(
-      roomShortCode,
+      roomId,
       videoId,
       req.payload.userId,
     );

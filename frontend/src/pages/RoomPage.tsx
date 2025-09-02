@@ -4,9 +4,11 @@ import { useSelector } from "react-redux";
 import { useVideos } from "../hooks/useVideos";
 import { useParams } from "react-router-dom";
 import ReactPlayer from "react-player";
+import { getSelectedRoom } from "../features/room/roomSlice";
 
 const RoomPage: React.FC = () => {
   const selectedVideoId = useSelector(getSelectedVideoId);
+  const selectedRoom = useSelector(getSelectedRoom);
   const { shortCode } = useParams<{ shortCode: string }>();
   const { videoStreamDetail, fetchVideoStreamDetail } = useVideos();
   const [messages, setMessages] = useState<{ user: string; text: string }[]>(
@@ -16,9 +18,9 @@ const RoomPage: React.FC = () => {
 
   useEffect(() => {
     if (selectedVideoId && shortCode) {
-      fetchVideoStreamDetail(shortCode, selectedVideoId);
+      fetchVideoStreamDetail(selectedRoom.id, selectedVideoId);
     }
-  }, [selectedVideoId, shortCode, fetchVideoStreamDetail]);
+  }, [selectedVideoId, selectedRoom, fetchVideoStreamDetail]);
 
   console.log("Selected Video", selectedVideoId);
 

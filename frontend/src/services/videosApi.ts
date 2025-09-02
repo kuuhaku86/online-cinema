@@ -93,11 +93,11 @@ export const getVideosApi = async (): Promise<VideoData[]> => {
 };
 
 export const getVideoDetailApi = async (
-  roomShortCode: string,
+  roomId: string,
   videoId: string
 ): Promise<StreamDetail> => {
   const response = await apiClient.get(
-    `/videos/stream-detail/${roomShortCode}/${videoId}`
+    `/videos/stream-detail/${roomId}/${videoId}`
   );
   if (response.status !== 200) {
     const errorData: ApiErrorResponse = response.data;

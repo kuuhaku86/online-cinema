@@ -23,14 +23,14 @@ export class Message {
   userId: string;
 
   @ManyToOne(() => Room, (room) => room.messages, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'room_short_code', referencedColumnName: 'shortCode' })
+  @JoinColumn({ name: 'room_id' })
   room: Room;
 
   @Column({
-    name: 'room_short_code',
+    name: 'room_id',
     type: 'varchar',
   })
-  roomShortCode: string;
+  roomId: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

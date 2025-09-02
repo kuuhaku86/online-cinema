@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useVideos } from "../hooks/useVideos";
 import { useRooms } from "../hooks/useRooms";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../store";
 import { setSelectedVideoId } from "../features/video/videoSlice";
+import { getSelectedRoom } from "../features/room/roomSlice";
 
 const VideoSelectionPage: React.FC = () => {
+  const selectedRoom = useSelector(getSelectedRoom);
   const { shortCode } = useParams<{ shortCode: string }>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -48,13 +50,13 @@ const VideoSelectionPage: React.FC = () => {
   };
 
   const handeStartRoom = async () => {
-    if (!shortCode) return;
+    if (!selectedRoom) return;
     if (!selectedVideo) return;
 
     try {
       console.log(selectedVideo);
       dispatch(setSelectedVideoId(selectedVideo.id));
-      await startRoom(shortCode, selectedVideo.id);
+      await startRoom(selectedRoom.id, selectedVideo.id);
       console.log("Room started successfully!");
       navigate(`/room/${shortCode}`);
     } catch (error) {

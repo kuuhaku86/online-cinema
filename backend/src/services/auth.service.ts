@@ -136,14 +136,10 @@ export class AuthService {
     return null;
   }
 
-  async generateStreamToken(
-    userId: string,
-    roomShortCode: string,
-    videoId: string,
-  ) {
+  async generateStreamToken(userId: string, roomId: string, videoId: string) {
     const payload = {
       userId: userId,
-      roomShortCode: roomShortCode,
+      roomId: roomId,
       videoId: videoId,
     };
 

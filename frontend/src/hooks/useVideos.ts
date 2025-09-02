@@ -107,14 +107,11 @@ export const useVideos = () => {
   }, []);
 
   const fetchVideoStreamDetail = useCallback(
-    async (roomShortCode: string, videoId: string) => {
+    async (roomId: string, videoId: string) => {
       setLoading(true);
       setError(null);
       try {
-        const fetchedStreamDetail = await getVideoDetailApi(
-          roomShortCode,
-          videoId
-        );
+        const fetchedStreamDetail = await getVideoDetailApi(roomId, videoId);
 
         setVideoStreamDetail(fetchedStreamDetail);
       } catch (err) {

@@ -1,13 +1,5 @@
 import { Expose } from 'class-transformer';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  MinLength,
-  MaxLength,
-  IsOptional,
-  Matches,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class StartRoomDto {
   @Expose({ name: 'video_id' })

@@ -20,10 +20,10 @@ export const joinRoomApi = async (shortCode: string): Promise<RoomData> => {
 };
 
 export const startRoomApi = async (
-  shortCode: string,
+  roomId: string,
   videoId: string
 ): Promise<RoomData> => {
-  const response = await apiClient.post<RoomData>(`/rooms/${shortCode}/start`, {
+  const response = await apiClient.post<RoomData>(`/rooms/${roomId}/start`, {
     video_id: videoId,
   });
   return response.data;

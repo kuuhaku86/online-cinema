@@ -12,12 +12,12 @@ export class MessagesService {
 
   async createMessage(
     userId: string,
-    roomShortCode: string,
+    roomId: string,
     content: string,
   ): Promise<Message> {
     const newMessage = this.messageRepository.create({
       userId,
-      roomShortCode,
+      roomId,
       content,
     });
 
@@ -28,9 +28,9 @@ export class MessagesService {
     return savedMessage;
   }
 
-  async getMessage(roomShortCode: string): Promise<Message[]> {
+  async getMessage(roomId: string): Promise<Message[]> {
     return this.messageRepository.find({
-      where: { roomShortCode },
+      where: { roomId },
     });
   }
 }
