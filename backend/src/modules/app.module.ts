@@ -12,6 +12,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from 'src/configs/redis-options.constants';
 import { HelpersModule } from './helpers.module';
 import { MessagesModule } from './messages.module';
+import { ChatGateway } from 'src/gateways/chat.gateway';
 
 @Module({
   imports: [
@@ -26,6 +27,6 @@ import { MessagesModule } from './messages.module';
     CacheModule.registerAsync(RedisOptions),
   ],
   controllers: [AppController, TestController],
-  providers: [AppService, TestService],
+  providers: [AppService, TestService, ChatGateway],
 })
 export class AppModule {}

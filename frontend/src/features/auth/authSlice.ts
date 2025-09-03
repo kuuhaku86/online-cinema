@@ -167,8 +167,8 @@ const getStoredUser = (): User | null => {
   return storedUser ? JSON.parse(storedUser) : null;
 };
 
-const getStoredRefreshToken = (): string | null => {
-  return localStorage.getItem("refreshToken");
+export const getStoredAccessToken = (): string | null => {
+  return localStorage.getItem("accessToken");
 };
 
 const initialState: AuthState = getInitialAuthState();
