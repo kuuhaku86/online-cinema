@@ -6,7 +6,7 @@ import {
   OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
-} from '@nestjs/platform-socket.io';
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WsAuthGuard } from 'src/auth/guards/ws-auth.guard';
 
