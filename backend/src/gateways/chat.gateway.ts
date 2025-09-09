@@ -39,7 +39,10 @@ export class ChatGateway
     );
 
     this.server.emit('chatMessage', {
-      sender: client.id,
+      sender: {
+        id: client.data.user.id,
+        username: client.data.user.username,
+      },
       message: payload.message,
     });
   }

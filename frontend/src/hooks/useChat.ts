@@ -3,7 +3,10 @@ import { io, Socket } from "socket.io-client";
 import { getStoredAccessToken } from "../features/auth/authSlice";
 
 interface Message {
-  sender: string;
+  sender: {
+    id: string;
+    username: string;
+  };
   message: string;
 }
 

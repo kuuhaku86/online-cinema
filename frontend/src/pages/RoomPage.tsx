@@ -5,15 +5,14 @@ import { useVideos } from "../hooks/useVideos";
 import { useParams } from "react-router-dom";
 import ReactPlayer from "react-player";
 import { getSelectedRoom } from "../features/room/roomSlice";
+import { useChat } from "../hooks/useChat";
 
 const RoomPage: React.FC = () => {
   const selectedVideoId = useSelector(getSelectedVideoId);
   const selectedRoom = useSelector(getSelectedRoom);
   const { shortCode } = useParams<{ shortCode: string }>();
   const { videoStreamDetail, fetchVideoStreamDetail } = useVideos();
-  const [messages, setMessages] = useState<{ user: string; text: string }[]>(
-    []
-  );
+  const { messages, sendMessage } = useChat(import.meta.env.VITE_API_HOST);
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
@@ -27,7 +26,7 @@ const RoomPage: React.FC = () => {
   const handleSendMessage = () => {
     if (newMessage.trim()) {
       // In a real app, you'd send this to a server via websockets
-      setMessages([...messages, { user: "You", text: newMessage }]);
+      sendMessage(newMessage);
       setNewMessage("");
     }
   };
@@ -55,7 +54,8 @@ const RoomPage: React.FC = () => {
           <div className="flex-grow overflow-y-auto mb-4 p-2 bg-[#333333] rounded-lg">
             {messages.map((msg, index) => (
               <div key={index} className="mb-2 text-left">
-                <span className="font-bold">{msg.user}:</span> {msg.text}
+                <span className="font-bold">{msg.sender.username}:</span>{" "}
+                {msg.message}
               </div>
             ))}
           </div>
