@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { getSelectedVideoId } from "../features/video/videoSlice";
 import { useSelector } from "react-redux";
 import { useVideos } from "../hooks/useVideos";
@@ -13,7 +13,7 @@ const RoomPage: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
   const { videoStreamDetail, fetchVideoStreamDetail } = useVideos();
   const { messages, sendMessage } = useChat(import.meta.env.VITE_API_HOST);
-  const [newMessage, setNewMessage] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (selectedVideoId && shortCode) {
@@ -23,13 +23,14 @@ const RoomPage: React.FC = () => {
 
   console.log("Selected Video", selectedVideoId);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      // In a real app, you'd send this to a server via websockets
-      sendMessage(newMessage);
-      setNewMessage("");
+  const handleSendMessage = useCallback(() => {
+    if (inputRef.current && inputRef.current.value.trim()) {
+      sendMessage(inputRef.current.value);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
     }
-  };
+  }, [sendMessage]);
 
   return (
     <div className="h-[90vh] flex flex-col">
@@ -62,8 +63,7 @@ const RoomPage: React.FC = () => {
           <div className="flex">
             <input
               type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              ref={inputRef}
               onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
               className="flex-grow bg-[#333333] border-[#333333] text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 placeholder-gray-400"
               placeholder="Type a message..."

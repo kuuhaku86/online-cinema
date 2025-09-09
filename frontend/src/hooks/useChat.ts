@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import { getStoredAccessToken } from "../features/auth/authSlice";
 
@@ -30,13 +30,16 @@ export const useChat = (serverUrl: string) => {
     return () => {
       newSocket.disconnect();
     };
-  }, [serverUrl]);
+  }, [serverUrl, accessToken]);
 
-  const sendMessage = (message: string) => {
-    if (socket) {
-      socket.emit("chatMessage", { message });
-    }
-  };
+  const sendMessage = useCallback(
+    (message: string) => {
+      if (socket) {
+        socket.emit("chatMessage", { message });
+      }
+    },
+    [socket]
+  );
 
   return { messages, sendMessage };
 };
