@@ -12,7 +12,10 @@ const RoomPage: React.FC = () => {
   const selectedRoom = useSelector(getSelectedRoom);
   const { shortCode } = useParams<{ shortCode: string }>();
   const { videoStreamDetail, fetchVideoStreamDetail } = useVideos();
-  const { messages, sendMessage } = useChat(import.meta.env.VITE_API_HOST);
+  const { messages, sendMessage } = useChat(
+    import.meta.env.VITE_API_HOST,
+    selectedRoom.id
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -25,7 +28,7 @@ const RoomPage: React.FC = () => {
 
   const handleSendMessage = useCallback(() => {
     if (inputRef.current && inputRef.current.value.trim()) {
-      sendMessage(inputRef.current.value);
+      sendMessage(inputRef.current.value, selectedRoom.id);
       if (inputRef.current) {
         inputRef.current.value = "";
       }

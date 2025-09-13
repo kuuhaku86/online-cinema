@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Room } from './room.entity';
+import { User } from './user.entity';
 
 @Entity('messages')
 export class Message {
@@ -14,7 +15,11 @@ export class Message {
   id: string;
 
   @Column('text')
-  content: string;
+  text: string;
+
+  @ManyToOne(() => User, (user) => user.messages, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @Column({
     name: 'user_id',

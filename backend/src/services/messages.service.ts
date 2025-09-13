@@ -18,7 +18,7 @@ export class MessagesService {
     const newMessage = this.messageRepository.create({
       userId,
       roomId,
-      content,
+      text: content,
     });
 
     const savedMessage = await this.messageRepository.save(newMessage);
@@ -31,6 +31,8 @@ export class MessagesService {
   async getMessage(roomId: string): Promise<Message[]> {
     return this.messageRepository.find({
       where: { roomId },
+      relations: ['user'],
+      order: { createdAt: 'ASC' },
     });
   }
 }

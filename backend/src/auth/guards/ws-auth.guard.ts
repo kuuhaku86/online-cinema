@@ -25,6 +25,7 @@ export class WsAuthGuard implements CanActivate {
       });
 
       client.data.user = payload;
+      client.data.user.id = payload.sub;
 
       return true;
     } catch (e) {

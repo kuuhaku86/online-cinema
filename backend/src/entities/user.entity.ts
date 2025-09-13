@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Video } from './video.entity';
+import { Message } from './message.entity';
 
 @Entity('users')
 export class User {
@@ -44,4 +45,7 @@ export class User {
 
   @OneToMany(() => Video, (video) => video.user)
   videos: Video[];
+
+  @OneToMany(() => Message, (message) => message.room)
+  messages: Message[];
 }
