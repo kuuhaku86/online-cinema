@@ -56,7 +56,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ roomId }) => {
               }`}
             >
               <div
-                className={`rounded-lg p-2 max-w-xs lg:max-w-md ${
+                className={`rounded-lg p-2 max-w-xs lg:max-w-md text-left ${
                   isSender ? "bg-blue-500 text-white" : "bg-gray-600 text-white"
                 }`}
               >

@@ -173,7 +173,6 @@ export class VideosService {
   ): Promise<StreamDetail | undefined> {
     const video = await this.videoRepository.findOneBy({
       id: videoId,
-      userId,
     });
 
     if (!video) {
