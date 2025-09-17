@@ -45,7 +45,7 @@ export const useChat = (serverUrl: string, roomId: string | undefined) => {
 
     newSocket.on("connect", () => {
       console.log("Socket connected successfully, joining room:", roomId);
-      newSocket.emit("joinRoom", { roomId });
+      newSocket.emit("joinRoomChat", { roomId });
     });
 
     newSocket.on("connect_error", (err: any) => {

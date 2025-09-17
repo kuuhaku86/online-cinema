@@ -1,4 +1,4 @@
-import { UseGuards, Logger } from '@nestjs/common';
+import { UseGuards, Logger, Inject, forwardRef } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -11,12 +11,12 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WsAuthGuard } from 'src/auth/guards/ws-auth.guard';
-import { MessagesService } from 'src/services/messages.service';
 import { RoomsService } from 'src/services/rooms.service';
 
-interface ChatMessagePayload {
-  message: string;
+interface RoomStatusPayload {
   roomId: string;
+  time: string;
+  play: boolean;
 }
 
 interface JoinRoomPayload {
@@ -24,21 +24,18 @@ interface JoinRoomPayload {
 }
 
 @WebSocketGateway({ cors: { origin: '*' } })
-export class ChatGateway
+export class RoomGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
   server: Server;
 
-  private readonly logger = new Logger(ChatGateway.name);
+  private readonly logger = new Logger(RoomGateway.name);
 
-  constructor(
-    private readonly roomsService: RoomsService,
-    private readonly messagesService: MessagesService,
-  ) {}
+  constructor(private readonly roomsService: RoomsService) {}
 
   afterInit(server: Server) {
-    this.logger.log('Chat Gateway Initialized!');
+    this.logger.log('Room Gateway Initialized!');
   }
 
   @UseGuards(WsAuthGuard)
@@ -52,7 +49,7 @@ export class ChatGateway
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('joinRoomChat')
+  @SubscribeMessage('joinRoom')
   async handleJoinRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: JoinRoomPayload,
@@ -75,21 +72,21 @@ export class ChatGateway
       `Client ${client.id} (user: ${userId}) joined room ${roomId}`,
     );
 
-    const previousMessages = await this.messagesService.getMessage(roomId);
-    client.emit('previousMessages', previousMessages);
+    const previousRoomStatus = await this.roomsService.getRoomStatus(roomId);
+    client.emit('previousRoomStatus', previousRoomStatus);
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('chatMessage')
+  @SubscribeMessage('updateRoomStatus')
   async handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: ChatMessagePayload,
+    @MessageBody() payload: RoomStatusPayload,
   ) {
-    const { roomId, message } = payload;
+    const { roomId, time, play } = payload;
     const user = client.data.user;
 
     this.logger.log(
-      `Received message from client ${client.id} in room ${roomId}: ${message}`,
+      `Received update from client ${client.id} in room ${roomId}: ${time} , ${play}`,
     );
 
     if (!client.rooms.has(roomId)) {
@@ -99,19 +96,15 @@ export class ChatGateway
       return;
     }
 
-    const newMessage = await this.messagesService.createMessage(
-      user.id,
+    const newMessage = await this.roomsService.updateRoomStatus(
       roomId,
-      message,
+      time,
+      play,
     );
 
-    this.server.to(roomId).emit('chatMessage', {
-      sender: {
-        id: user.id,
-        username: user.username,
-      },
-      message: newMessage.text,
-      createdAt: newMessage.createdAt,
+    this.server.to(roomId).emit('roomStatus', {
+      time,
+      play,
     });
   }
 }

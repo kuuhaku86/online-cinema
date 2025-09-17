@@ -13,6 +13,7 @@ import { RedisOptions } from 'src/configs/redis-options.constants';
 import { HelpersModule } from './helpers.module';
 import { MessagesModule } from './messages.module';
 import { ChatGateway } from 'src/gateways/chat.gateway';
+import { RoomGateway } from 'src/gateways/room.gateway';
 
 @Module({
   imports: [
@@ -27,6 +28,6 @@ import { ChatGateway } from 'src/gateways/chat.gateway';
     CacheModule.registerAsync(RedisOptions),
   ],
   controllers: [AppController, TestController],
-  providers: [AppService, TestService, ChatGateway],
+  providers: [AppService, TestService, ChatGateway, RoomGateway],
 })
 export class AppModule {}

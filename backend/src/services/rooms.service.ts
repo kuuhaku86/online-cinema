@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,6 +10,12 @@ import { Repository } from 'typeorm';
 import { Room } from '../entities/room.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { Video } from 'src/entities/video.entity';
+import { RedisHelper } from 'src/helpers/redis.helper';
+
+type RoomStatus = {
+  time: string;
+  play: boolean;
+};
 
 @Injectable()
 export class RoomsService {
@@ -16,6 +24,7 @@ export class RoomsService {
     private readonly roomRepository: Repository<Room>,
     @InjectRepository(Video)
     private readonly videoRepository: Repository<Video>,
+    @Inject(forwardRef(() => RedisHelper)) readonly redisHelper: RedisHelper,
   ) {}
 
   async createRoom(userId: string): Promise<Room> {
@@ -120,5 +129,16 @@ export class RoomsService {
     }
 
     return room?.userIds.includes(userId);
+  }
+
+  async updateRoomStatus(roomId: string, time: string, play: boolean) {
+    await this.redisHelper.set(roomId, {
+      time,
+      play,
+    });
+  }
+
+  async getRoomStatus(roomId: string): Promise<RoomStatus | undefined> {
+    return await this.redisHelper.get<RoomStatus | undefined>(roomId);
   }
 }
