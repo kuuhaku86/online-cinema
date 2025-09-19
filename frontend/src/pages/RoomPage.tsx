@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { getSelectedVideoId } from "../features/video/videoSlice";
 import { useSelector } from "react-redux";
 import { useVideos } from "../hooks/useVideos";
@@ -7,6 +7,8 @@ import ReactPlayer from "react-player";
 import { getSelectedRoom } from "../features/room/roomSlice";
 import ChatWindow from "../components/ChatWindow";
 import { useAuth } from "../hooks/useAuth";
+import { useRoomStatus } from "../hooks/useRoomStatus";
+import { throttle } from "lodash";
 
 const RoomPage: React.FC = () => {
   const selectedVideoId = useSelector(getSelectedVideoId);
@@ -16,6 +18,15 @@ const RoomPage: React.FC = () => {
   const { user } = useAuth();
   const [volume, setVolume] = useState(0.8);
   const isOwner = user?.id === selectedRoom?.ownerId;
+  const playerRef = useRef<ReactPlayer>(null);
+  const [playing, setPlaying] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const seekingRef = useRef(false);
+
+  const { roomStatus, updateRoomStatus } = useRoomStatus(
+    process.env.REACT_APP_WS_URL || "http://localhost:3001",
+    selectedRoom?.id
+  );
 
   useEffect(() => {
     if (selectedVideoId && shortCode && selectedRoom) {
@@ -23,7 +34,76 @@ const RoomPage: React.FC = () => {
     }
   }, [selectedVideoId, selectedRoom, fetchVideoStreamDetail, shortCode]);
 
-  console.log("Selected Video", selectedVideoId);
+  // Effect to synchronize player state from incoming room status
+  useEffect(() => {
+    if (roomStatus && isReady) {
+      setPlaying(roomStatus.play);
+
+      const localTime = playerRef.current?.getCurrentTime() || 0;
+      const remoteTime = parseFloat(roomStatus.time);
+
+      // Only seek if the time difference is significant, to avoid small jumps.
+      if (Math.abs(localTime - remoteTime) > 2) {
+        seekingRef.current = true;
+        playerRef.current?.seekTo(remoteTime, "seconds");
+      }
+    }
+  }, [roomStatus, isReady]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const throttledUpdateStatus = useCallback(
+    throttle((status: { play: boolean; time: string }) => {
+      updateRoomStatus(status);
+    }, 1000),
+    [updateRoomStatus]
+  );
+
+  const handlePlay = () => {
+    if (isOwner) {
+      setPlaying(true);
+      updateRoomStatus({
+        play: true,
+        time: String(playerRef.current?.getCurrentTime() || 0),
+      });
+    }
+  };
+
+  const handlePause = () => {
+    if (isOwner) {
+      setPlaying(false);
+      updateRoomStatus({
+        play: false,
+        time: String(playerRef.current?.getCurrentTime() || 0),
+      });
+    }
+  };
+
+  const handleSeek = (seconds: number) => {
+    if (isOwner) {
+      if (seekingRef.current) {
+        seekingRef.current = false;
+        return;
+      }
+      updateRoomStatus({ play: playing, time: String(seconds) });
+    }
+  };
+
+  const handleProgress = (progress: { playedSeconds: number }) => {
+    if (isOwner && playing) {
+      throttledUpdateStatus({
+        play: true,
+        time: String(progress.playedSeconds),
+      });
+    }
+  };
+
+  const handleReady = () => {
+    setIsReady(true);
+    if (roomStatus) {
+      setPlaying(roomStatus.play);
+      playerRef.current?.seekTo(parseFloat(roomStatus.time), "seconds");
+    }
+  };
 
   if (!selectedRoom) {
     // A better loading/error state could be implemented here.
@@ -38,11 +118,19 @@ const RoomPage: React.FC = () => {
         <div className="flex-[3] p-5 flex flex-col justify-center items-center text-center">
           {videoStreamDetail && (
             <ReactPlayer
+              ref={playerRef}
               width="100%"
               height="100%"
               src={videoStreamDetail!.urlStream}
+              playing={playing}
               controls={isOwner}
               volume={isOwner ? undefined : volume}
+              onReady={handleReady}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              onSeek={handleSeek}
+              onProgress={handleProgress}
+              progressInterval={1000}
             />
           )}
           {!isOwner && videoStreamDetail && (
