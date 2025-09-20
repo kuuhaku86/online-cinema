@@ -26,7 +26,7 @@ export const useRoomStatus = (
       return;
     }
 
-    const newSocket = io(serverUrl, {
+    const newSocket = io(`${serverUrl}/room`, {
       auth: {
         token: accessToken,
       },

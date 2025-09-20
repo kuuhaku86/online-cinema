@@ -23,7 +23,7 @@ interface JoinRoomPayload {
   roomId: string;
 }
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ namespace: 'chat', cors: { origin: '*' } })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -52,7 +52,7 @@ export class ChatGateway
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('joinRoomChat')
+  @SubscribeMessage('joinRoom')
   async handleJoinRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: JoinRoomPayload,

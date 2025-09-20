@@ -23,7 +23,7 @@ interface JoinRoomPayload {
   roomId: string;
 }
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ namespace: 'room', cors: { origin: '*' } })
 export class RoomGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

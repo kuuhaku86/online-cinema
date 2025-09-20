@@ -36,7 +36,7 @@ export const useChat = (serverUrl: string, roomId: string | undefined) => {
       return;
     }
 
-    const newSocket = io(serverUrl, {
+    const newSocket = io(`${serverUrl}/chat`, {
       auth: {
         token: accessToken,
       },
@@ -45,7 +45,7 @@ export const useChat = (serverUrl: string, roomId: string | undefined) => {
 
     newSocket.on("connect", () => {
       console.log("Socket connected successfully, joining room:", roomId);
-      newSocket.emit("joinRoomChat", { roomId });
+      newSocket.emit("joinRoom", { roomId });
     });
 
     newSocket.on("connect_error", (err: any) => {
