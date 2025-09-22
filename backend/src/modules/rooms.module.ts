@@ -6,12 +6,14 @@ import { RoomsService } from '../services/rooms.service';
 import { AuthModule } from './auth.module';
 import { Video } from 'src/entities/video.entity';
 import { MessagesModule } from './messages.module';
+import { HelpersModule } from './helpers.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Room, Video]),
     AuthModule,
     MessagesModule,
+    HelpersModule,
   ],
   controllers: [RoomsController],
   providers: [RoomsService],

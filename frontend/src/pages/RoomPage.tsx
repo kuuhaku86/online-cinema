@@ -24,7 +24,7 @@ const RoomPage: React.FC = () => {
   const seekingRef = useRef(false);
 
   const { roomStatus, updateRoomStatus } = useRoomStatus(
-    process.env.REACT_APP_WS_URL || "http://localhost:3001",
+    import.meta.env.VITE_API_HOST || "http://localhost:3001",
     selectedRoom?.id
   );
 
@@ -39,13 +39,15 @@ const RoomPage: React.FC = () => {
     if (roomStatus && isReady) {
       setPlaying(roomStatus.play);
 
-      const localTime = playerRef.current?.getCurrentTime() || 0;
+      const localTime = playerRef.current?.currentTime || 0;
       const remoteTime = parseFloat(roomStatus.time);
 
       // Only seek if the time difference is significant, to avoid small jumps.
       if (Math.abs(localTime - remoteTime) > 2) {
         seekingRef.current = true;
-        playerRef.current?.seekTo(remoteTime, "seconds");
+        if (playerRef.current) {
+          playerRef.current.currentTime = remoteTime;
+        }
       }
     }
   }, [roomStatus, isReady]);
@@ -63,7 +65,7 @@ const RoomPage: React.FC = () => {
       setPlaying(true);
       updateRoomStatus({
         play: true,
-        time: String(playerRef.current?.getCurrentTime() || 0),
+        time: String(playerRef.current?.currentTime || 0),
       });
     }
   };
@@ -73,7 +75,7 @@ const RoomPage: React.FC = () => {
       setPlaying(false);
       updateRoomStatus({
         play: false,
-        time: String(playerRef.current?.getCurrentTime() || 0),
+        time: String(playerRef.current?.currentTime || 0),
       });
     }
   };
@@ -97,11 +99,14 @@ const RoomPage: React.FC = () => {
     }
   };
 
-  const handleReady = () => {
+  const handleReady = (player: ReactPlayer) => {
     setIsReady(true);
     if (roomStatus) {
       setPlaying(roomStatus.play);
-      playerRef.current?.seekTo(parseFloat(roomStatus.time), "seconds");
+      console.log(player);
+      if (playerRef.current) {
+        playerRef.current.currentTime = parseFloat(roomStatus.time);
+      }
     }
   };
 
