@@ -103,10 +103,15 @@ const RoomPage: React.FC = () => {
     setIsReady(true);
     if (roomStatus) {
       setPlaying(roomStatus.play);
-      console.log(player);
       if (playerRef.current) {
         playerRef.current.currentTime = parseFloat(roomStatus.time);
       }
+    }
+  };
+
+  const handleFullscreen = () => {
+    if (playerRef.current) {
+      (playerRef.current as HTMLElement)?.requestFullscreen();
     }
   };
 
@@ -139,23 +144,31 @@ const RoomPage: React.FC = () => {
             />
           )}
           {!isOwner && videoStreamDetail && (
-            <div className="w-full max-w-xs mt-4">
-              <label
-                htmlFor="volume-slider"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            <div className="w-full max-w-md mt-4 flex items-center gap-4">
+              <div className="flex-grow">
+                <label
+                  htmlFor="volume-slider"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Volume
+                </label>
+                <input
+                  id="volume-slider"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={volume}
+                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                />
+              </div>
+              <button
+                onClick={handleFullscreen}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700"
               >
-                Volume
-              </label>
-              <input
-                id="volume-slider"
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={volume}
-                onChange={(e) => setVolume(parseFloat(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-              />
+                Fullscreen
+              </button>
             </div>
           )}
         </div>
