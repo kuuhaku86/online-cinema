@@ -18,6 +18,7 @@ const RoomPage: React.FC = () => {
   const { user } = useAuth();
   const [volume, setVolume] = useState(0.8);
   const isOwner = user?.id === selectedRoom?.ownerId;
+  const [muted, setMuted] = useState(!isOwner);
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -134,6 +135,7 @@ const RoomPage: React.FC = () => {
               src={videoStreamDetail!.urlStream}
               playing={playing}
               controls={isOwner}
+              muted={muted}
               volume={isOwner ? undefined : volume}
               onReady={handleReady}
               onPlay={handlePlay}
@@ -159,7 +161,10 @@ const RoomPage: React.FC = () => {
                   max="1"
                   step="0.05"
                   value={volume}
-                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    setVolume(parseFloat(e.target.value));
+                    setMuted(false);
+                  }}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
               </div>
