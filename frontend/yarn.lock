@@ -2863,6 +2863,13 @@ math-intrinsics@^1.1.0:
   resolved "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz"
   integrity sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==
 
+media-chrome@^4.13.1:
+  version "4.13.1"
+  resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-4.13.1.tgz#adf71f7e64ee5facb60a04f508d85c2f334ec81e"
+  integrity sha512-jPPwYrFkM4ky27/xNYEeyRPOBC7qvru4Oydy7vQHMHplXLQJmjtcauhlLPvG0O5kkYFEaOBXv5zGYes/UxOoVw==
+  dependencies:
+    ce-la-react "^0.3.0"
+
 media-chrome@~4.11.0, media-chrome@~4.11.1:
   version "4.11.1"
   resolved "https://registry.yarnpkg.com/media-chrome/-/media-chrome-4.11.1.tgz#daefd1786e4b7d0ddfdd2782c44c1057add86578"

@@ -9,6 +9,18 @@ import ChatWindow from "../components/ChatWindow";
 import { useAuth } from "../hooks/useAuth";
 import { useRoomStatus } from "../hooks/useRoomStatus";
 import { throttle } from "lodash";
+import {
+  MediaController,
+  MediaControlBar,
+  MediaTimeRange,
+  MediaTimeDisplay,
+  MediaVolumeRange,
+  MediaPlayButton,
+  MediaSeekBackwardButton,
+  MediaSeekForwardButton,
+  MediaMuteButton,
+  MediaFullscreenButton,
+} from "media-chrome/react";
 
 const RoomPage: React.FC = () => {
   const selectedVideoId = useSelector(getSelectedVideoId);
@@ -127,55 +139,58 @@ const RoomPage: React.FC = () => {
       <div className="flex gap-5 flex-1">
         {/* Column 1 */}
         <div className="flex-[3] p-5 flex flex-col justify-center items-center text-center">
-          {videoStreamDetail && (
-            <ReactPlayer
-              ref={playerRef}
-              width="100%"
-              height="100%"
-              src={videoStreamDetail!.urlStream}
-              playing={playing}
-              controls={isOwner}
-              muted={muted}
-              volume={isOwner ? undefined : volume}
-              onReady={handleReady}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              onSeek={handleSeek}
-              onProgress={handleProgress}
-              progressInterval={1000}
-            />
-          )}
-          {!isOwner && videoStreamDetail && (
-            <div className="w-full max-w-md mt-4 flex items-center gap-4">
-              <div className="flex-grow">
-                <label
-                  htmlFor="volume-slider"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Volume
-                </label>
-                <input
-                  id="volume-slider"
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value={volume}
-                  onChange={(e) => {
-                    setVolume(parseFloat(e.target.value));
-                    setMuted(false);
-                  }}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-                />
-              </div>
-              <button
-                onClick={handleFullscreen}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700"
+          <div className="relative w-full h-full">
+            {videoStreamDetail && (
+              <MediaController
+                style={{
+                  width: "100%",
+                  aspectRatio: "16/9",
+                }}
               >
-                Fullscreen
-              </button>
-            </div>
-          )}
+                <ReactPlayer
+                  ref={playerRef}
+                  width="100%"
+                  height="100%"
+                  src={videoStreamDetail!.urlStream}
+                  playing={playing}
+                  muted={muted}
+                  volume={isOwner ? undefined : volume}
+                  onReady={handleReady}
+                  onPlay={handlePlay}
+                  onPause={handlePause}
+                  onSeek={handleSeek}
+                  onProgress={handleProgress}
+                  progressInterval={1000}
+                  slot="media"
+                  controls={false}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    "--controls": "none",
+                  }}
+                ></ReactPlayer>
+                <MediaControlBar
+                  style={{
+                    gap: "20px",
+                    alignItems: "center",
+                    backgroundColor: "rgb(20 20 30 / .7)",
+                    "--media-control-background": "transparent",
+                    "--media-button-background": "transparent",
+                  }}
+                >
+                  {!isOwner && <div style={{ flexGrow: 1 }}></div>}
+                  {isOwner && <MediaPlayButton />}
+                  {isOwner && <MediaSeekBackwardButton seekOffset={10} />}
+                  {isOwner && <MediaSeekForwardButton seekOffset={10} />}
+                  {isOwner && <MediaTimeRange />}
+                  <MediaTimeDisplay showDuration />
+                  <MediaMuteButton />
+                  <MediaVolumeRange />
+                  <MediaFullscreenButton />
+                </MediaControlBar>
+              </MediaController>
+            )}
+          </div>
         </div>
         {/* Column 2 - Chat Window */}
         <ChatWindow roomId={selectedRoom.id} />
