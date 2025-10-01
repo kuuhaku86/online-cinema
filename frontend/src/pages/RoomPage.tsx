@@ -28,11 +28,10 @@ const RoomPage: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
   const { videoStreamDetail, fetchVideoStreamDetail } = useVideos();
   const { user } = useAuth();
-  const [volume, setVolume] = useState(0.8);
   const isOwner = user?.id === selectedRoom?.ownerId;
-  const [muted, setMuted] = useState(!isOwner);
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
   const [isReady, setIsReady] = useState(false);
   const seekingRef = useRef(false);
 
@@ -122,12 +121,6 @@ const RoomPage: React.FC = () => {
     }
   };
 
-  const handleFullscreen = () => {
-    if (playerRef.current) {
-      (playerRef.current as HTMLElement)?.requestFullscreen();
-    }
-  };
-
   if (!selectedRoom) {
     // A better loading/error state could be implemented here.
     return <div>Loading room...</div>;
@@ -142,6 +135,15 @@ const RoomPage: React.FC = () => {
           <div className="relative w-full h-full">
             {videoStreamDetail && (
               <MediaController
+                onClick={() => {
+                  if (muted) {
+                    setMuted(false);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (muted && (e.key === " " || e.key === "Enter"))
+                    setMuted(false);
+                }}
                 style={{
                   width: "100%",
                   aspectRatio: "16/9",
@@ -152,9 +154,8 @@ const RoomPage: React.FC = () => {
                   width="100%"
                   height="100%"
                   src={videoStreamDetail!.urlStream}
-                  playing={playing}
                   muted={muted}
-                  volume={isOwner ? undefined : volume}
+                  playing={playing}
                   onReady={handleReady}
                   onPlay={handlePlay}
                   onPause={handlePause}
@@ -169,6 +170,16 @@ const RoomPage: React.FC = () => {
                     "--controls": "none",
                   }}
                 ></ReactPlayer>
+                {muted && (
+                  <div
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-2xl cursor-pointer"
+                    onClick={() => setMuted(false)}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    Click to unmute
+                  </div>
+                )}
                 <MediaControlBar
                   style={{
                     gap: "20px",

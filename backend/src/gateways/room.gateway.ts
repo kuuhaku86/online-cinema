@@ -96,15 +96,12 @@ export class RoomGateway
       return;
     }
 
-    const newMessage = await this.roomsService.updateRoomStatus(
-      roomId,
-      time,
-      play,
-    );
+    console.log(time, play);
+    await this.roomsService.updateRoomStatus(roomId, time, play);
+    const roomStatus = await this.roomsService.getRoomStatus(roomId);
 
-    this.server.to(roomId).emit('roomStatus', {
-      time,
-      play,
-    });
+    console.log(roomStatus);
+
+    this.server.to(roomId).emit('roomStatus', roomStatus);
   }
 }

@@ -43,10 +43,12 @@ export const useRoomStatus = (
     });
 
     newSocket.on("previousRoomStatus", (payload: RoomStatus) => {
+      console.log("Received previous room status:", payload);
       setRoomStatus(payload);
     });
 
     newSocket.on("roomStatus", (payload: RoomStatus) => {
+      console.log("Received room status:", payload);
       setRoomStatus(payload);
     });
 
