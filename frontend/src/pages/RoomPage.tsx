@@ -74,6 +74,7 @@ const RoomPage: React.FC = () => {
 
   const handlePlay = () => {
     if (isOwner) {
+      console.log("play", playerRef.current?.currentTime);
       setPlaying(true);
       updateRoomStatus({
         play: true,
@@ -84,6 +85,7 @@ const RoomPage: React.FC = () => {
 
   const handlePause = () => {
     if (isOwner) {
+      console.log("pause", playerRef.current?.currentTime);
       setPlaying(false);
       updateRoomStatus({
         play: false,
@@ -94,19 +96,20 @@ const RoomPage: React.FC = () => {
 
   const handleSeek = (seconds: number) => {
     if (isOwner) {
-      if (seekingRef.current) {
-        seekingRef.current = false;
-        return;
-      }
-      updateRoomStatus({ play: playing, time: String(seconds) });
+      console.log("seek", playerRef.current?.currentTime);
+      // if (seekingRef.current) {
+      //   seekingRef.current = false;
+      //   return;
+      // }
+      // updateRoomStatus({ play: playing, time: String(seconds) });
     }
   };
 
-  const handleProgress = (progress: { playedSeconds: number }) => {
+  const handleProgress = () => {
     if (isOwner && playing) {
       throttledUpdateStatus({
         play: true,
-        time: String(progress.playedSeconds),
+        time: String(playerRef.current?.currentTime),
       });
     }
   };
