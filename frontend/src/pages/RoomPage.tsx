@@ -32,7 +32,6 @@ const RoomPage: React.FC = () => {
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
-  const [isReady, setIsReady] = useState(false);
   const seekingRef = useRef(false);
 
   const { roomStatus, updateRoomStatus } = useRoomStatus(
@@ -48,7 +47,7 @@ const RoomPage: React.FC = () => {
 
   // Effect to synchronize player state from incoming room status
   useEffect(() => {
-    if (roomStatus && isReady) {
+    if (roomStatus) {
       setPlaying(roomStatus.play);
 
       const localTime = playerRef.current?.currentTime || 0;
@@ -62,7 +61,7 @@ const RoomPage: React.FC = () => {
         }
       }
     }
-  }, [roomStatus, isReady]);
+  }, [roomStatus]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const throttledUpdateStatus = useCallback(
@@ -94,14 +93,11 @@ const RoomPage: React.FC = () => {
     }
   };
 
-  const handleSeek = (seconds: number) => {
+  const handleSeeked = () => {
     if (isOwner) {
-      console.log("seek", playerRef.current?.currentTime);
-      // if (seekingRef.current) {
-      //   seekingRef.current = false;
-      //   return;
-      // }
-      // updateRoomStatus({ play: playing, time: String(seconds) });
+      const currentTime = playerRef.current?.currentTime || 0;
+      console.log("Owner seeked to:", currentTime);
+      updateRoomStatus({ play: playing, time: String(currentTime) });
     }
   };
 
@@ -115,7 +111,6 @@ const RoomPage: React.FC = () => {
   };
 
   const handleReady = (player: ReactPlayer) => {
-    setIsReady(true);
     if (roomStatus) {
       setPlaying(roomStatus.play);
       if (playerRef.current) {
@@ -162,8 +157,8 @@ const RoomPage: React.FC = () => {
                   onReady={handleReady}
                   onPlay={handlePlay}
                   onPause={handlePause}
-                  onSeek={handleSeek}
                   onProgress={handleProgress}
+                  onSeeked={handleSeeked}
                   progressInterval={1000}
                   slot="media"
                   controls={false}
