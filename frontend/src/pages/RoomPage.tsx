@@ -33,6 +33,7 @@ const RoomPage: React.FC = () => {
   const [playing, setPlaying] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [muted, setMuted] = useState(true);
+  const [copyButtonText, setCopyButtonText] = useState("Copy");
   const seekingRef = useRef(false);
 
   const { roomStatus, updateRoomStatus } = useRoomStatus(
@@ -120,6 +121,52 @@ const RoomPage: React.FC = () => {
     }
   };
 
+  const handleCopyCode = () => {
+    if (!shortCode) return;
+
+    // Use modern Clipboard API if available (secure contexts)
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shortCode).then(
+        () => {
+          setCopyButtonText("Copied!");
+          setTimeout(() => setCopyButtonText("Copy"), 2000);
+        },
+        (err) => {
+          console.error("Async: Could not copy text: ", err);
+          setCopyButtonText("Failed");
+          setTimeout(() => setCopyButtonText("Copy"), 2000);
+        }
+      );
+    } else {
+      // Fallback for older browsers or insecure contexts
+      const textArea = document.createElement("textarea");
+      textArea.value = shortCode;
+      textArea.style.position = "fixed"; // Prevent scrolling to bottom of page in MS Edge.
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.width = "2em";
+      textArea.style.height = "2em";
+      textArea.style.padding = "0";
+      textArea.style.border = "none";
+      textArea.style.outline = "none";
+      textArea.style.boxShadow = "none";
+      textArea.style.background = "transparent";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        const successful = document.execCommand("copy");
+        if (successful) {
+          setCopyButtonText("Copied!");
+          setTimeout(() => setCopyButtonText("Copy"), 2000);
+        }
+      } catch (err) {
+        console.error("Fallback: Oops, unable to copy", err);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
   if (!selectedRoom) {
     // A better loading/error state could be implemented here.
     return <div>Loading room...</div>;
@@ -127,6 +174,18 @@ const RoomPage: React.FC = () => {
 
   return (
     <div className="h-[90vh] flex flex-col">
+      <div className="p-1 flex items-center justify-center gap-2 rounded-lg mb-1 mx-2">
+        <span className="text-white font-medium">Room Code:</span>
+        <code className="text-lg font-bold text-red-400 px-1 py-1 rounded">
+          {shortCode}
+        </code>
+        <button
+          onClick={handleCopyCode}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-4 rounded text-sm transition-all duration-200 ease-in-out"
+        >
+          {copyButtonText}
+        </button>
+      </div>
       {/* Parent 2: Flex container for columns. Removed h-screen and min-h-screen. flex-1 will make it fill Parent 1. */}
       <div className="flex gap-5 flex-1">
         {/* Column 1 */}
