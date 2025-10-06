@@ -5,9 +5,9 @@ import { useVideos } from "../hooks/useVideos";
 import { useParams } from "react-router-dom";
 import ReactPlayer from "react-player";
 import { getSelectedRoom } from "../features/room/roomSlice";
-import ChatWindow from "../components/ChatWindow";
 import { useAuth } from "../hooks/useAuth";
 import { useRoomStatus } from "../hooks/useRoomStatus";
+import CollapsibleChatWindow from "../components/CollapsibleChatWindow";
 import { throttle } from "lodash";
 import {
   MediaController,
@@ -31,6 +31,7 @@ const RoomPage: React.FC = () => {
   const isOwner = user?.id === selectedRoom?.ownerId;
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true);
   const [muted, setMuted] = useState(true);
   const seekingRef = useRef(false);
 
@@ -129,7 +130,11 @@ const RoomPage: React.FC = () => {
       {/* Parent 2: Flex container for columns. Removed h-screen and min-h-screen. flex-1 will make it fill Parent 1. */}
       <div className="flex gap-5 flex-1">
         {/* Column 1 */}
-        <div className="flex-[3] p-5 flex flex-col justify-center items-center text-center">
+        <div
+          className={`p-5 flex flex-col justify-center items-center text-center ${
+            isChatOpen ? "flex-[3]" : "flex-1"
+          }`}
+        >
           <div className="relative w-full h-full">
             {videoStreamDetail && (
               <MediaController
@@ -202,7 +207,10 @@ const RoomPage: React.FC = () => {
           </div>
         </div>
         {/* Column 2 - Chat Window */}
-        <ChatWindow roomId={selectedRoom.id} />
+        <CollapsibleChatWindow
+          roomId={selectedRoom.id}
+          onToggle={setIsChatOpen}
+        />
       </div>
     </div>
   );

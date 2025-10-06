@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 
 interface ChatWindowProps {
   roomId: string;
+  onToggle?: () => void;
 }
 
 /**
@@ -20,7 +21,7 @@ const stringToColor = (str: string) => {
   return `hsl(${h}, 75%, 70%)`;
 };
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ roomId }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ roomId, onToggle }) => {
   const { messages, sendMessage } = useChat(
     import.meta.env.VITE_API_HOST,
     roomId
@@ -44,7 +45,32 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ roomId }) => {
 
   return (
     <div className="flex-1 p-5 flex flex-col border-2 rounded-lg border-[#333333] mt-5 mr-5">
-      <h2 className="text-xl font-bold mb-4 text-center">Chat</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-center flex-grow">Chat</h2>
+        {onToggle && (
+          <button
+            type="button"
+            className="p-2.5 text-white hover:text-white"
+            aria-label="Hide chat"
+            onClick={onToggle}
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 5l7 7-7 7M5 5l7 7-7 7"
+              ></path>
+            </svg>
+          </button>
+        )}
+      </div>
       <div className="flex-grow overflow-y-auto mb-4 p-2 bg-[#333333] rounded-lg flex flex-col space-y-2">
         {messages.map((msg, index) => {
           const isSender = msg.sender.id === user?.id;
