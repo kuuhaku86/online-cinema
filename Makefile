@@ -22,8 +22,12 @@ build:
 	docker-compose -p $(PROJECT_NAME) build
 
 rebuild-backend:
-	docker-compose -p $(PROJECT_NAME) down -d backend
+	docker-compose -p $(PROJECT_NAME) down backend
 	docker-compose -p $(PROJECT_NAME) up --build -d backend
+
+rebuild-hate-speech-detector:
+	docker-compose -p $(PROJECT_NAME) down hate-speech-detector
+	docker-compose -p $(PROJECT_NAME) up --build -d hate-speech-detector
 
 rebuild:
 	docker-compose -p $(PROJECT_NAME) down

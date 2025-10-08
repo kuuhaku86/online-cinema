@@ -72,6 +72,16 @@ services:
     networks:
       - online-cinema-net
 
+  hate-speech-detector:
+    build: ./hate-speech-detector
+    container_name: online-cinema-hate-speech-detector
+    ports:
+      - "5000:5000"
+    depends_on:
+      - backend
+    networks:
+      - online-cinema-net
+
 volumes:
   postgres_data:
   redis_data:
