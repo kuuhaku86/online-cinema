@@ -15,6 +15,9 @@ restart:
 logs:
 	docker-compose -p $(PROJECT_NAME) logs -f
 
+logs-hate-speech-detector:
+	docker-compose -p $(PROJECT_NAME) logs -f hate-speech-detector
+
 ps:
 	docker-compose -p $(PROJECT_NAME) ps
 

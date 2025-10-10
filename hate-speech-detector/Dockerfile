@@ -16,7 +16,7 @@ WORKDIR /app/hate-speech-detector/server
 
 # Install dependencies
 # COPY requirements.txt .
-RUN pip install --no-cache-dir flask
+RUN pip install --no-cache-dir flask flask_cors tensorflow
 
 # Expose the port
 EXPOSE 5000
