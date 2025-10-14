@@ -50,6 +50,9 @@ ssh-backend:
 ssh-frontend:
 	docker exec -it online-cinema-frontend bash
 
+ssh-hate-speech-detector:
+	docker exec -it online-cinema-hate-speech-detector bash
+
 create-migration-backend:
 	docker exec -it online-cinema-backend npm run migration:create --name=$(NAME)
 	$(MAKE) fix-migration-permissions
