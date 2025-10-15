@@ -20,6 +20,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - APP_URL=http://192.168.0.10:3000
+      - HATE_SPEECH_DETECTOR_URL=http://hate-speech-detector:5000
     depends_on:
       - db
       - redis
