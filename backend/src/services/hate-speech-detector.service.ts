@@ -20,11 +20,15 @@ export class HateSpeechDetectorService {
 
   public async detect(text: string): Promise<HateSpeechDetectionResult> {
     try {
-      const response = await axios.post<HateSpeechDetectionResult>(
-        this.apiUrl,
-        { text },
-      );
-      return response.data;
+      if (!this.apiUrl) {
+        throw new Error('API URL is not set.');
+      } else {
+        const response = await axios.post<HateSpeechDetectionResult>(
+          this.apiUrl,
+          { text },
+        );
+        return response.data;
+      }
     } catch (error) {
       console.error(
         'Error calling Hate Speech Detector API:',
