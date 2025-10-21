@@ -24,7 +24,7 @@ export class HateSpeechDetectorService {
         throw new Error('API URL is not set.');
       } else {
         const response = await axios.post<HateSpeechDetectionResult>(
-          this.apiUrl,
+          this.apiUrl + '/analyze',
           { text },
         );
         return response.data;
