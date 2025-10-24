@@ -16,6 +16,7 @@ A full-stack online cinema platform built with a modern tech stack, designed for
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
     - [Running the Application](#running-the-application)
+    - [Development Commands (using Makefile)](#development-commands-using-makefile)
   - [API Endpoints](#api-endpoints)
   - [Hate Speech Detection Service](#hate-speech-detection-service)
   - [Contributing](#contributing)
@@ -83,6 +84,82 @@ Once all services are up:
 -   The **Backend API** will be accessible at `http://localhost:3000`.
 -   The **Frontend Application** will be accessible at `http://localhost:5173`.
 -   The **Hate Speech Detector Service** runs internally within the Docker network and is not directly exposed to the host, but can be accessed by the backend at `http://hate-speech-detector:5000`.
+
+### Development Commands (using Makefile)
+The project includes a `Makefile.mk` with convenient commands for development and management of the Docker Compose services. You can run these commands using `make <command-name>`.
+
+-   **`make up`**: Starts all services in detached mode.
+    ```bash
+    make up
+    ```
+-   **`make down`**: Stops and removes all services, networks, and volumes created by `docker-compose`.
+    ```bash
+    make down
+    ```
+-   **`make restart`**: Stops, removes, and then restarts all services.
+    ```bash
+    make restart
+    ```
+-   **`make logs`**: Displays aggregated logs from all services in follow mode.
+    ```bash
+    make logs
+    ```
+-   **`make logs-hate-speech-detector`**: Displays logs specifically for the `hate-speech-detector` service.
+    ```bash
+    make logs-hate-speech-detector
+    ```
+-   **`make ps`**: Lists all running Docker Compose services.
+    ```bash
+    make ps
+    ```
+-   **`make build`**: Builds or rebuilds service images.
+    ```bash
+    make build
+    ```
+-   **`make rebuild`**: Stops, rebuilds, and restarts all services. Useful after making changes to `Dockerfile`s.
+    ```bash
+    make rebuild
+    ```
+-   **`make rebuild-backend`**: Rebuilds and restarts only the `backend` service.
+    ```bash
+    make rebuild-backend
+    ```
+-   **`make rebuild-hate-speech-detector`**: Rebuilds and restarts only the `hate-speech-detector` service.
+    ```bash
+    make rebuild-hate-speech-detector
+    ```
+-   **`make test-backend`**: Runs unit tests for the backend service.
+    ```bash
+    make test-backend
+    ```
+-   **`make test-backend-e2e`**: Runs end-to-end tests for the backend service.
+    ```bash
+    make test-backend-e2e
+    ```
+-   **`make ssh-backend`**: Opens a bash shell inside the `backend` container.
+    ```bash
+    make ssh-backend
+    ```
+-   **`make ssh-frontend`**: Opens a bash shell inside the `frontend` container.
+    ```bash
+    make ssh-frontend
+    ```
+-   **`make ssh-hate-speech-detector`**: Opens a bash shell inside the `hate-speech-detector` container.
+    ```bash
+    make ssh-hate-speech-detector
+    ```
+-   **`make create-migration-backend NAME=<migration_name>`**: Creates a new TypeORM migration file for the backend. Replace `<migration_name>` with a descriptive name.
+    ```bash
+    make create-migration-backend NAME=AddUsersTable
+    ```
+-   **`make run-migration-backend`**: Runs all pending TypeORM migrations for the backend.
+    ```bash
+    make run-migration-backend
+    ```
+-   **`make run-migration-rollback-backend`**: Reverts the last executed TypeORM migration for the backend.
+    ```bash
+    make run-migration-rollback-backend
+    ```
 
 ## API Endpoints
 The backend exposes various RESTful API endpoints. Key endpoints include:
