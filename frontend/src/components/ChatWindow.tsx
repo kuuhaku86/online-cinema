@@ -44,7 +44,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ roomId, onToggle }) => {
   }, [messages]);
 
   return (
-    <div className="flex-1 p-5 flex flex-col border-2 rounded-lg border-[#333333] mt-5 mr-5">
+    <div className="flex-1 p-5 flex flex-col border-2 rounded-lg border-[#333333] mt-5 mr-5 h-2/3">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-center flex-grow">Chat</h2>
         {onToggle && (
@@ -71,7 +71,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ roomId, onToggle }) => {
           </button>
         )}
       </div>
-      <div className="flex-grow overflow-y-auto mb-4 p-2 bg-[#333333] rounded-lg flex flex-col space-y-2">
+      <div className="flex-grow overflow-y-scroll mb-4 p-2 bg-[#333333] rounded-lg flex flex-col space-y-2">
         {messages.map((msg, index) => {
           const isSender = msg.sender.id === user?.id;
           return (
