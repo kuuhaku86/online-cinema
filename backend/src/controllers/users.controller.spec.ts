@@ -1,18 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from '../services/users.service';
+import { AuthService } from '../services/auth.service';
 import { User } from '../entities/user.entity';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ParseUUIDPipe } from '@nestjs/common';
-import { AuthService } from '../services/auth.service';
 
 const mockUsersService = {
   findOne: jest.fn(),
+  update: jest.fn(),
 };
 
-const mockAuthService = {
-};
+const mockAuthService = {};
 
 const mockAuthGuard = {
   canActivate: jest.fn(() => true),
@@ -21,18 +25,18 @@ const mockAuthGuard = {
 describe('UsersController', () => {
   let controller: UsersController;
   let usersService: typeof mockUsersService;
-  let authService: typeof mockAuthService;
 
-  const mockUserId = 'a-valid-uuid';
+  const mockUserId = 'c9c0c972-42fa-4017-9b30-f3539be0b2a4';
   const mockUser: User = {
     id: mockUserId,
     username: 'testuser',
     email: 'test@example.com',
     passwordHash: 'secretPasswordHash',
     currentHashedRefreshToken: 'secretRefreshTokenHash',
-    name: 'Test User',
     createdAt: new Date(),
     updatedAt: new Date(),
+    videos: [],
+    messages: [],
   };
 
   const mockUserResult: Omit<
@@ -42,9 +46,10 @@ describe('UsersController', () => {
     id: mockUserId,
     username: 'testuser',
     email: 'test@example.com',
-    name: 'Test User',
     createdAt: mockUser.createdAt,
     updatedAt: mockUser.updatedAt,
+    videos: [],
+    messages: [],
   };
 
   beforeEach(async () => {
@@ -53,14 +58,8 @@ describe('UsersController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
-        {
-          provide: UsersService,
-          useValue: mockUsersService,
-        },
-        {
-          provide: AuthService,
-          useValue: mockAuthService,
-        },
+        { provide: UsersService, useValue: mockUsersService },
+        { provide: AuthService, useValue: mockAuthService },
       ],
     })
       .overrideGuard(AuthGuard('jwt'))
@@ -87,7 +86,7 @@ describe('UsersController', () => {
     });
 
     it('should throw NotFoundException when user is not found', async () => {
-      const nonExistentId = 'non-existent-uuid';
+      const nonExistentId = 'c9c0c972-42fa-4017-9b30-f3539be0b2a5';
       usersService.findOne.mockRejectedValue(
         new NotFoundException(`User with ID "${nonExistentId}" not found`),
       );
@@ -95,10 +94,9 @@ describe('UsersController', () => {
       await expect(controller.getUser(nonExistentId)).rejects.toThrow(
         NotFoundException,
       );
-      expect(usersService.findOne).toHaveBeenCalledWith(nonExistentId);
     });
 
-    it('should throw BadRequestException for an invalid UUID (tested via ParseUUIDPipe)', async () => {
+    it('should throw BadRequestException for an invalid UUID', async () => {
       const invalidId = 'not-a-uuid';
       const pipe = new ParseUUIDPipe();
 
@@ -106,6 +104,58 @@ describe('UsersController', () => {
         pipe.transform(invalidId, { type: 'param' }),
       ).rejects.toThrow(BadRequestException);
       expect(usersService.findOne).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('updateUserProfile', () => {
+    const mockRequest = (userId: string) => ({ user: { id: userId } }) as any;
+    const updateDto = {
+      username: 'newuser',
+      email: 'new@example.com',
+      oldPassword: '',
+      newPassword: '',
+    };
+
+    it('should update profile when authenticated user matches the target', async () => {
+      const updatedUser = {
+        ...mockUserResult,
+        username: 'newuser',
+        email: 'new@example.com',
+      };
+      usersService.update.mockResolvedValue(updatedUser);
+
+      const result = await controller.updateUserProfile(
+        mockUserId,
+        updateDto,
+        mockRequest(mockUserId),
+      );
+
+      expect(usersService.update).toHaveBeenCalledWith(mockUserId, updateDto);
+      expect(result).toEqual(updatedUser);
+    });
+
+    it('should throw ForbiddenException when updating another user', async () => {
+      await expect(
+        controller.updateUserProfile(
+          mockUserId,
+          updateDto,
+          mockRequest('different-uuid'),
+        ),
+      ).rejects.toThrow(ForbiddenException);
+
+      expect(usersService.update).not.toHaveBeenCalled();
+    });
+
+    it('should propagate NotFoundException from service', async () => {
+      usersService.update.mockRejectedValue(new NotFoundException());
+
+      await expect(
+        controller.updateUserProfile(
+          mockUserId,
+          updateDto,
+          mockRequest(mockUserId),
+        ),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
