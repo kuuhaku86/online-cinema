@@ -2,3 +2,4 @@ Flask
 hate_speech_detector
 gunicorn
 scikit-learn
+pytest
