@@ -46,18 +46,20 @@ describe('UsersService', () => {
     email: 'test@example.com',
     passwordHash: 'hashedPassword123',
     currentHashedRefreshToken: 'hashedPassword123',
-    name: 'Test User',
     createdAt: new Date(),
     updatedAt: new Date(),
+    videos: [],
+    messages: [],
   };
 
   const mockUserWithoutSensitiveData: Omit<User, 'passwordHash' | 'currentHashedRefreshToken'> = {
     id: mockUser.id,
     username: mockUser.username,
     email: mockUser.email,
-    name: mockUser.name,
     createdAt: mockUser.createdAt,
     updatedAt: mockUser.updatedAt,
+    videos: [],
+    messages: [],
   };
 
 
@@ -65,7 +67,6 @@ describe('UsersService', () => {
     username: 'newuser',
     email: 'new@example.com',
     password: mockUserPassword,
-    name: 'New User',
   };
 
   beforeEach(async () => {
@@ -121,7 +122,6 @@ describe('UsersService', () => {
       expect(userRepository.create).toHaveBeenCalledWith({
         username: mockCreateUserDto.username,
         email: mockCreateUserDto.email,
-        name: mockCreateUserDto.name,
         passwordHash: 'hashedPassword123',
       });
       expect(userRepository.save).toHaveBeenCalledWith(

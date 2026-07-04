@@ -30,9 +30,10 @@ describe('AuthService', () => {
     email: 'test@example.com',
     passwordHash: 'hashedPassword123',
     currentHashedRefreshToken: 'hashedRefreshToken123',
-    name: 'Test User',
     createdAt: new Date(),
     updatedAt: new Date(),
+    videos: [],
+    messages: [],
   };
 
   const mockUserWithoutSensitiveData: Omit<
@@ -42,9 +43,10 @@ describe('AuthService', () => {
     id: 'user-uuid-1',
     username: 'testuser',
     email: 'test@example.com',
-    name: 'Test User',
     createdAt: mockUser.createdAt,
     updatedAt: mockUser.updatedAt,
+    videos: [],
+    messages: [],
   };
 
   beforeEach(async () => {

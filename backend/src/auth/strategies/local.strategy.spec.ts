@@ -13,9 +13,10 @@ const mockUserResult: Omit<User, 'passwordHash' | 'currentHashedRefreshToken'> =
     id: 'user-uuid-1',
     username: 'testuser',
     email: 'test@example.com',
-    name: 'Test User',
     createdAt: new Date(),
     updatedAt: new Date(),
+    videos: [],
+    messages: [],
   };
 
 describe('LocalStrategy', () => {

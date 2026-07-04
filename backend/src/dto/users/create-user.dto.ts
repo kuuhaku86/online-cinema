@@ -27,8 +27,4 @@ export class CreateUserDto {
   })
   readonly password: string;
 
-  @IsString()
-  @IsOptional()
-  @MaxLength(100)
-  readonly name?: string;
 }

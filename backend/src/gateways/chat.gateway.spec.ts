@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { ChatGateway } from './chat.gateway';
 import { RoomsService } from 'src/services/rooms.service';
 import { MessagesService } from 'src/services/messages.service';
@@ -32,6 +33,7 @@ describe('ChatGateway', () => {
         ChatGateway,
         { provide: RoomsService, useValue: roomsService },
         { provide: MessagesService, useValue: messagesService },
+        { provide: JwtService, useValue: { verify: jest.fn() } },
       ],
     }).compile();
 

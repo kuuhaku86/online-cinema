@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { RoomGateway } from './room.gateway';
 import { RoomsService } from 'src/services/rooms.service';
 
@@ -32,6 +33,7 @@ describe('RoomGateway', () => {
       providers: [
         RoomGateway,
         { provide: RoomsService, useValue: roomsService },
+        { provide: JwtService, useValue: { verify: jest.fn() } },
       ],
     }).compile();
 
@@ -81,9 +83,7 @@ describe('RoomGateway', () => {
   describe('handleMessage (updateRoomStatus)', () => {
     it('should update and broadcast room status', async () => {
       const mockStatus = { time: '01:30', play: false };
-      roomsService.getRoomStatus
-        .mockResolvedValueOnce(undefined)
-        .mockResolvedValueOnce(mockStatus);
+      roomsService.getRoomStatus.mockResolvedValue(mockStatus);
       const client = createMockSocket(new Set([mockRoomId]));
       const roomEmit = jest.fn();
       gateway.server.to = jest.fn().mockReturnValue({ emit: roomEmit });

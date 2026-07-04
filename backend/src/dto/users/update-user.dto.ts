@@ -36,8 +36,4 @@ export class UpdateUserDto {
   })
   readonly newPassword: string;
 
-  @IsString()
-  @IsOptional()
-  @MaxLength(100)
-  readonly name?: string;
 }

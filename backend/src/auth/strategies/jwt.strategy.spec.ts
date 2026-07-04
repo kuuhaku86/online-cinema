@@ -14,9 +14,10 @@ const mockUser: User = {
   email: 'test@example.com',
   passwordHash: 'hashedPassword123',
   currentHashedRefreshToken: null,
-  name: 'Test User',
   createdAt: new Date(),
   updatedAt: new Date(),
+  videos: [],
+  messages: [],
 };
 
 interface JwtPayload {
