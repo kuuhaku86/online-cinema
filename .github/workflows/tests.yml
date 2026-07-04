@@ -1,0 +1,35 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend
+        run: docker compose -p online-cinema-ci build backend
+      - name: Run backend unit tests
+        run: docker compose -p online-cinema-ci run --no-deps --rm backend npm run test
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build frontend
+        run: docker compose -p online-cinema-ci build frontend
+      - name: Run frontend tests
+        run: docker compose -p online-cinema-ci run --no-deps --rm frontend npx vitest run
+
+  hate-speech-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build hate-speech-detector
+        run: docker compose -p online-cinema-ci build hate-speech-detector
+      - name: Run hate speech detector tests
+        run: docker compose -p online-cinema-ci run --no-deps --rm hate-speech-detector pytest test_app.py

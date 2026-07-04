@@ -23,6 +23,7 @@ RUN mkdir -p /usr/local/lib/python3.9/site-packages/hate_speech_detector/assets/
 
 # Copy the application code
 COPY app.py .
+COPY test_app.py .
 
 EXPOSE 5000
 
