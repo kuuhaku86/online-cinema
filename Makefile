@@ -92,6 +92,7 @@ ps-prod:
 	docker compose $(COMPOSE_PROD) ps
 
 build-frontend:
+	docker compose $(COMPOSE_PROD) build frontend-builder
 	docker compose $(COMPOSE_PROD) run --rm frontend-builder
 
 run-migration-prod:
