@@ -29,7 +29,7 @@ const RoomPage: React.FC = () => {
   const { videoStreamDetail, fetchVideoStreamDetail } = useVideos();
   const { user } = useAuth();
   const isOwner = user?.id === selectedRoom?.ownerId;
-  const playerRef = useRef<ReactPlayer>(null);
+  const playerRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [muted, setMuted] = useState(true);
@@ -38,11 +38,11 @@ const RoomPage: React.FC = () => {
 
   const { roomStatus, updateRoomStatus } = useRoomStatus(
     "",
-    selectedRoom?.id
+    selectedRoom?.id ?? undefined
   );
 
   useEffect(() => {
-    if (selectedVideoId && shortCode && selectedRoom) {
+    if (selectedVideoId && shortCode && selectedRoom?.id) {
       fetchVideoStreamDetail(selectedRoom.id, selectedVideoId);
     }
   }, [selectedVideoId, selectedRoom, fetchVideoStreamDetail, shortCode]);
@@ -223,7 +223,6 @@ const RoomPage: React.FC = () => {
                   onPause={handlePause}
                   onProgress={handleProgress}
                   onSeeked={handleSeeked}
-                  progressInterval={1000}
                   slot="media"
                   controls={false}
                   style={{
@@ -267,7 +266,7 @@ const RoomPage: React.FC = () => {
         </div>
         {/* Column 2 - Chat Window */}
         <CollapsibleChatWindow
-          roomId={selectedRoom.id}
+          roomId={selectedRoom.id!}
           onToggle={setIsChatOpen}
         />
       </div>

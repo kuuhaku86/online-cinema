@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as userApi from "../../services/usersApi";
 import type { RootState } from "../../store";
 import { User, setUser } from "../auth/authSlice"; // Import User and the new setUser action
@@ -59,7 +59,7 @@ const userSlice = createSlice({
       })
       .addCase(
         updateProfile.fulfilled,
-        (state, action: PayloadAction<User>) => {
+        (state) => {
           state.updateLoading = "succeeded";
           state.updateError = null;
         }

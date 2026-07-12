@@ -6,7 +6,7 @@ interface LoginFormProps {
   onSwitch?: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onClose, onSwitch }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onClose: _, onSwitch }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signIn, loading, error, isAuthenticated } = useAuth();

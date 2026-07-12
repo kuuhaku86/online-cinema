@@ -162,11 +162,6 @@ const getInitialAuthState = (): AuthState => {
 };
 
 // Helper functions for localStorage
-const getStoredUser = (): User | null => {
-  const storedUser = localStorage.getItem("user");
-  return storedUser ? JSON.parse(storedUser) : null;
-};
-
 export const getStoredAccessToken = (): string | null => {
   return localStorage.getItem("accessToken");
 };
@@ -220,7 +215,7 @@ const authSlice = createSlice({
         state.registrationStatus = "pending";
         state.error = null;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(register.fulfilled, (state) => {
         state.registrationStatus = "succeeded";
         state.error = null;
       })

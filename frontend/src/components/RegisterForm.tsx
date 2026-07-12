@@ -6,7 +6,7 @@ interface RegisterFormProps {
   onSwitch?: () => void;
 }
 
-const RegisterForm: React.FC<RegisterFormProps> = ({ onClose, onSwitch }) => {
+const RegisterForm: React.FC<RegisterFormProps> = ({ onClose: _, onSwitch }) => {
   const { signUp, registrationStatus, error } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");

@@ -50,7 +50,7 @@ const VideoSelectionPage: React.FC = () => {
   };
 
   const handeStartRoom = async () => {
-    if (!selectedRoom) return;
+    if (!selectedRoom?.id) return;
     if (!selectedVideo) return;
 
     try {
