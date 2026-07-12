@@ -23,16 +23,10 @@ services:
       - disabled
 
   db:
-    ports:
-      - "127.0.0.1:5433:5432"
 
   redis:
-    ports:
-      - "127.0.0.1:6381:6379"
 
   hate-speech-detector:
-    ports:
-      - "127.0.0.1:5001:5000"
 
   frontend-builder:
     build: ./frontend

@@ -1,40 +1,41 @@
 # Makefile for Docker Compose
 
 PROJECT_NAME=online-cinema
+COMPOSE_DEV=-f docker-compose.yaml -f docker-compose.dev.yaml -p $(PROJECT_NAME)
 
 up:
-	docker compose -p $(PROJECT_NAME) up -d
+	docker compose $(COMPOSE_DEV) up -d
 
 down:
-	docker compose -p $(PROJECT_NAME) down
+	docker compose $(COMPOSE_DEV) down
 
 restart:
-	docker compose -p $(PROJECT_NAME) down
-	docker compose -p $(PROJECT_NAME) up -d
+	docker compose $(COMPOSE_DEV) down
+	docker compose $(COMPOSE_DEV) up -d
 
 logs:
-	docker compose -p $(PROJECT_NAME) logs -f
+	docker compose $(COMPOSE_DEV) logs -f
 
 logs-hate-speech-detector:
-	docker compose -p $(PROJECT_NAME) logs -f hate-speech-detector
+	docker compose $(COMPOSE_DEV) logs -f hate-speech-detector
 
 ps:
-	docker compose -p $(PROJECT_NAME) ps
+	docker compose $(COMPOSE_DEV) ps
 
 build:
-	docker compose -p $(PROJECT_NAME) build
+	docker compose $(COMPOSE_DEV) build
 
 rebuild-backend:
-	docker compose -p $(PROJECT_NAME) down backend
-	docker compose -p $(PROJECT_NAME) up --build -d backend
+	docker compose $(COMPOSE_DEV) down backend
+	docker compose $(COMPOSE_DEV) up --build -d backend
 
 rebuild-hate-speech-detector:
-	docker compose -p $(PROJECT_NAME) down hate-speech-detector
-	docker compose -p $(PROJECT_NAME) up --build -d hate-speech-detector
+	docker compose $(COMPOSE_DEV) down hate-speech-detector
+	docker compose $(COMPOSE_DEV) up --build -d hate-speech-detector
 
 rebuild:
-	docker compose -p $(PROJECT_NAME) down
-	docker compose -p $(PROJECT_NAME) up --build -d
+	docker compose $(COMPOSE_DEV) down
+	docker compose $(COMPOSE_DEV) up --build -d
 
 test-backend:
 	@echo "Running backend tests..."
