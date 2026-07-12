@@ -1,13 +1,12 @@
 import { Middleware } from "@reduxjs/toolkit";
-import { RootState } from "./index";
 import {
   setSelectedVideoId,
   clearSelectedVideoId,
 } from "../features/video/videoSlice";
 import { clearSelectedRoom, setSelectedRoom } from "../features/room/roomSlice";
 
-export const localStorageMiddleware: Middleware<{}, RootState> =
-  (store) => (next) => (action) => {
+export const localStorageMiddleware: Middleware =
+  (_store) => (next) => (action) => {
     const result = next(action);
 
     if (setSelectedVideoId.match(action)) {

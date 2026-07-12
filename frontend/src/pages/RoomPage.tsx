@@ -112,7 +112,7 @@ const RoomPage: React.FC = () => {
     }
   };
 
-  const handleReady = (player: ReactPlayer) => {
+  const handleReady = () => {
     if (roomStatus) {
       setPlaying(roomStatus.play);
       if (playerRef.current) {
@@ -230,7 +230,7 @@ const RoomPage: React.FC = () => {
                     width: "100%",
                     height: "100%",
                     "--controls": "none",
-                  }}
+                  } as React.CSSProperties}
                 ></ReactPlayer>
                 {muted && (
                   <div
@@ -249,7 +249,7 @@ const RoomPage: React.FC = () => {
                     backgroundColor: "rgb(20 20 30 / .7)",
                     "--media-control-background": "transparent",
                     "--media-button-background": "transparent",
-                  }}
+                  } as React.CSSProperties}
                 >
                   {!isOwner && <div style={{ flexGrow: 1 }}></div>}
                   {isOwner && <MediaPlayButton />}
