@@ -65,3 +65,36 @@ run-migration-rollback-backend:
 
 fix-migration-permissions:
 	docker exec -it online-cinema-backend find src/migrations -maxdepth 1 -type f -exec chmod 666 {} +
+
+# --- Production targets (uses docker-compose.yaml + docker-compose.prod.yaml) ---
+
+COMPOSE_PROD=-f docker-compose.yaml -f docker-compose.prod.yaml -p $(PROJECT_NAME)
+
+up-prod:
+	docker-compose $(COMPOSE_PROD) up -d
+
+down-prod:
+	docker-compose $(COMPOSE_PROD) down
+
+restart-prod:
+	docker-compose $(COMPOSE_PROD) down
+	docker-compose $(COMPOSE_PROD) up -d
+
+rebuild-prod:
+	docker-compose $(COMPOSE_PROD) down
+	docker-compose $(COMPOSE_PROD) up -d --build
+
+logs-prod:
+	docker-compose $(COMPOSE_PROD) logs -f
+
+ps-prod:
+	docker-compose $(COMPOSE_PROD) ps
+
+build-frontend:
+	docker-compose $(COMPOSE_PROD) run --rm frontend-builder
+
+run-migration-prod:
+	docker exec -it online-cinema-backend npm run migration:run
+
+run-migration-rollback-prod:
+	docker exec -it online-cinema-backend npm run migration:revert
