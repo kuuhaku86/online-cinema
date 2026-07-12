@@ -6,7 +6,7 @@ import {
 } from "../features/auth/authSlice";
 import apiClient from "./apiClient"; // Import the new apiClient
 
-const API_BASE_URL = import.meta.env.VITE_API_HOST + "/api/auth";
+const API_BASE_URL = "/api/auth";
 
 export const login = async (credentials: LoginCredentials): Promise<User> => {
   // Use apiClient for consistency, though login doesn't strictly need interceptors for outgoing token

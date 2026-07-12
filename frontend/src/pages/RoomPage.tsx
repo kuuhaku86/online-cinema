@@ -37,7 +37,7 @@ const RoomPage: React.FC = () => {
   const seekingRef = useRef(false);
 
   const { roomStatus, updateRoomStatus } = useRoomStatus(
-    import.meta.env.VITE_API_HOST || "http://localhost:3001",
+    "",
     selectedRoom?.id
   );
 

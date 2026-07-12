@@ -42,10 +42,11 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: yarn dev
+    command: npm run dev
     environment:
       - CHOKIDAR_USEPOLLING=true
       - VITE_SERVER_HOST=true
+      - VITE_PROXY_TARGET=http://backend:3000
 
   db:
     image: postgres:15

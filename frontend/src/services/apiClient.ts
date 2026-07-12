@@ -4,8 +4,7 @@ import { refreshToken as refreshTokenApi } from "./authApi"; // API call for ref
 // import type { RootState, AppDispatch } from "../store";
 // import type { Tokens } from "../features/auth/authSlice";
 
-const VITE_API_HOST = import.meta.env.VITE_API_HOST;
-const API_BASE_URL = import.meta.env.VITE_API_HOST + "/api";
+const API_BASE_URL = "/api";
 export const LOGIN_URL = "/login"; // Your frontend login route
 
 const apiClient = axios.create({

@@ -23,7 +23,7 @@ const stringToColor = (str: string) => {
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ roomId, onToggle }) => {
   const { messages, sendMessage } = useChat(
-    import.meta.env.VITE_API_HOST,
+    "",
     roomId
   );
   const { user } = useAuth();
