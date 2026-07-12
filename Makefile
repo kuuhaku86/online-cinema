@@ -3,38 +3,38 @@
 PROJECT_NAME=online-cinema
 
 up:
-	docker-compose -p $(PROJECT_NAME) up -d
+	docker compose -p $(PROJECT_NAME) up -d
 
 down:
-	docker-compose -p $(PROJECT_NAME) down
+	docker compose -p $(PROJECT_NAME) down
 
 restart:
-	docker-compose -p $(PROJECT_NAME) down
-	docker-compose -p $(PROJECT_NAME) up -d
+	docker compose -p $(PROJECT_NAME) down
+	docker compose -p $(PROJECT_NAME) up -d
 
 logs:
-	docker-compose -p $(PROJECT_NAME) logs -f
+	docker compose -p $(PROJECT_NAME) logs -f
 
 logs-hate-speech-detector:
-	docker-compose -p $(PROJECT_NAME) logs -f hate-speech-detector
+	docker compose -p $(PROJECT_NAME) logs -f hate-speech-detector
 
 ps:
-	docker-compose -p $(PROJECT_NAME) ps
+	docker compose -p $(PROJECT_NAME) ps
 
 build:
-	docker-compose -p $(PROJECT_NAME) build
+	docker compose -p $(PROJECT_NAME) build
 
 rebuild-backend:
-	docker-compose -p $(PROJECT_NAME) down backend
-	docker-compose -p $(PROJECT_NAME) up --build -d backend
+	docker compose -p $(PROJECT_NAME) down backend
+	docker compose -p $(PROJECT_NAME) up --build -d backend
 
 rebuild-hate-speech-detector:
-	docker-compose -p $(PROJECT_NAME) down hate-speech-detector
-	docker-compose -p $(PROJECT_NAME) up --build -d hate-speech-detector
+	docker compose -p $(PROJECT_NAME) down hate-speech-detector
+	docker compose -p $(PROJECT_NAME) up --build -d hate-speech-detector
 
 rebuild:
-	docker-compose -p $(PROJECT_NAME) down
-	docker-compose -p $(PROJECT_NAME) up --build -d
+	docker compose -p $(PROJECT_NAME) down
+	docker compose -p $(PROJECT_NAME) up --build -d
 
 test-backend:
 	@echo "Running backend tests..."
@@ -71,27 +71,27 @@ fix-migration-permissions:
 COMPOSE_PROD=-f docker-compose.yaml -f docker-compose.prod.yaml -p $(PROJECT_NAME)
 
 up-prod:
-	docker-compose $(COMPOSE_PROD) up -d
+	docker compose $(COMPOSE_PROD) up -d
 
 down-prod:
-	docker-compose $(COMPOSE_PROD) down
+	docker compose $(COMPOSE_PROD) down
 
 restart-prod:
-	docker-compose $(COMPOSE_PROD) down
-	docker-compose $(COMPOSE_PROD) up -d
+	docker compose $(COMPOSE_PROD) down
+	docker compose $(COMPOSE_PROD) up -d
 
 rebuild-prod:
-	docker-compose $(COMPOSE_PROD) down
-	docker-compose $(COMPOSE_PROD) up -d --build
+	docker compose $(COMPOSE_PROD) down
+	docker compose $(COMPOSE_PROD) up -d --build
 
 logs-prod:
-	docker-compose $(COMPOSE_PROD) logs -f
+	docker compose $(COMPOSE_PROD) logs -f
 
 ps-prod:
-	docker-compose $(COMPOSE_PROD) ps
+	docker compose $(COMPOSE_PROD) ps
 
 build-frontend:
-	docker-compose $(COMPOSE_PROD) run --rm frontend-builder
+	docker compose $(COMPOSE_PROD) run --rm frontend-builder
 
 run-migration-prod:
 	docker exec -it online-cinema-backend npm run migration:run
