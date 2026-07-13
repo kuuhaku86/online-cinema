@@ -22,6 +22,8 @@ services:
       - disabled
 
   db:
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
 
   redis:
 
